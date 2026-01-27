@@ -769,6 +769,33 @@ div class="title">
       if (user) console.log('Signed in as:', user.displayName || user.email);
     });
   </script>
+<!-- Audio element -->
+<audio id="bgAudio" autoplay muted loop>
+  <source src="https://image2url.com/r2/default/audio/1769552444168-2dc6d28e-3eae-4ac5-a85e-5199ac245af3.m4a<p></p>" type="audio/mpeg">
+</audio>
 
+<script>
+  const audio = document.getElementById("bgAudio");
+
+  // Unmute & play on first user click
+  document.addEventListener("click", () => {
+    audio.muted = false;
+    audio.play().catch(() => {});
+  }, { once: true });
+
+  // Stop audio when page/tab is hidden
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+  });
+
+  // Stop audio when leaving/reloading page
+  window.addEventListener("beforeunload", () => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+</script>
 </body>
 </html>

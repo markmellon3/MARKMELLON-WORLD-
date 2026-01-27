@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>markmellon world Login</title>
+  <title>Lamp Login</title>
   <style>
     :root {
       --on: 0;
@@ -17,6 +17,10 @@
       --primary-dark: #ea580c;
       --success: #10b981;
       --error: #ef4444;
+      --google-bg: #ffffff;
+      --google-text: #000000;
+      --github-bg: #24292e;
+      --github-text: #ffffff;
     }
 
     * {
@@ -60,7 +64,6 @@
       flex-wrap: wrap;
     }
 
-    /* Lamp styles unchanged */
     .lamp {
       position: relative;
       width: clamp(220px, 45vw, 300px);
@@ -188,7 +191,6 @@
       transition-duration: calc(var(--pull-duration) * 0.4);
     }
 
-    /* Login/Signup Card */
     .login-card {
       background: #17202a;
       padding: clamp(1.8rem, 5vw, 3.2rem) clamp(1.5rem, 4vw, 2.8rem);
@@ -266,6 +268,43 @@
       cursor: not-allowed;
     }
 
+    .oauth-icons {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .oauth-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .oauth-icon:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    }
+
+    .google-icon {
+      background: var(--google-bg);
+    }
+
+    .github-icon {
+      background: var(--github-bg);
+    }
+
+    .oauth-icon svg {
+      width: 32px;
+      height: 32px;
+    }
+
     .toggle-link {
       margin-top: 1.5rem;
       font-size: 0.95rem;
@@ -291,7 +330,6 @@
     .success { color: var(--success); }
     .error { color: var(--error); }
 
-    /* Loading spinner */
     .loading-spinner {
       position: absolute;
       top: 50%;
@@ -303,7 +341,6 @@
       border-top: 5px solid var(--primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      z-index: 10;
     }
 
     @keyframes spin {
@@ -331,25 +368,23 @@
         width: 100%;
         max-width: 420px;
       }
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 1rem;
+      .oauth-icons {
+        gap: 2rem;
       }
-      .title {
-        font-size: 2.4rem;
+      .oauth-icon {
+        width: 50px;
+        height: 50px;
       }
-      .lamp {
-        width: 260px;
-        height: 400px;
+      .oauth-icon svg {
+        width: 28px;
+        height: 28px;
       }
     }
   </style>
 </head>
-<body data-on="0">
+<body data-on="1">
 
-  <div class="title">Lamp-login</div>
+<h2> <div class="title">MARKMELLONS WORLD </div></h2>
 
   <div class="scene">
     <div class="lamp" id="lamp">
@@ -378,6 +413,20 @@
           <input type="password" id="signin-password" placeholder="••••••••" autocomplete="current-password" />
         </div>
         <button id="signin-btn">Sign In</button>
+
+        <div class="oauth-icons">
+          <div class="oauth-icon google-icon" id="google-signin" title="Sign in with Google">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.44-3.392-7.44-7.574s3.345-7.574 7.44-7.574c2.33 0 3.916.858 4.822 1.6l3.28-3.16C18.455 1.2 15.218 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z" fill="#4285F4"/>
+            </svg>
+          </div>
+          <div class="oauth-icon github-icon" id="github-signin" title="Sign in with GitHub">
+            <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+          </div>
+        </div>
+
         <a id="forgot-password" style="display:block; margin-top:1rem; font-size:0.9rem; color:var(--primary); cursor:pointer;">Forgot password?</a>
         <div class="toggle-link">
           Don't have an account? <a id="to-signup">Sign Up</a>
@@ -405,13 +454,27 @@
           <input type="password" id="signup-confirm" placeholder="••••••••" autocomplete="new-password" />
         </div>
         <button id="signup-btn">Sign Up</button>
+
+        <div class="oauth-icons">
+          <div class="oauth-icon google-icon" id="google-signup" title="Sign up with Google">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.44-3.392-7.44-7.574s3.345-7.574 7.44-7.574c2.33 0 3.916.858 4.822 1.6l3.28-3.16C18.455 1.2 15.218 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z" fill="#4285F4"/>
+            </svg>
+          </div>
+          <div class="oauth-icon github-icon" id="github-signup" title="Sign up with GitHub">
+            <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+          </div>
+        </div>
+
         <div class="toggle-link">
           Already have an account? <a id="to-signin">Sign In</a>
         </div>
         <div id="signup-message" class="message"></div>
       </div>
 
-      <!-- Password Reset Section -->
+      <!-- Password Reset -->
       <div id="reset-form" class="form-container" style="display: none;">
         <h1>Reset Password</h1>
         <div class="form-group">
@@ -427,37 +490,50 @@
     </div>
   </div>
 
-  <div class="credit">@markmellonworld</div>
+  <div class="credit">markmellon</div>
 
   <!-- Optional click sound -->
   <audio id="clickSound" preload="auto">
     <source src="https://assets.codepen.io/605876/click.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Firebase SDK (compat version) -->
-  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+  <!-- Firebase SDK (modular v12) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword, 
+      sendPasswordResetEmail,
+      updateProfile,
+      GoogleAuthProvider,
+      GithubAuthProvider,
+      signInWithPopup,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
-  <script>
-    // REPLACE WITH YOUR ACTUAL FIREBASE CONFIG
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyAD0QJvrnC0zxnGnbfVg3Y74Tffy6rxjmU",
+      authDomain: "markmellon-world.firebaseapp.com",
+      projectId: "markmellon-world",
+      storageBucket: "markmellon-world.firebasestorage.app",
+      messagingSenderId: "414939524675",
+      appId: "1:414939524675:web:c98e0f4d301d933d1d6ef6",
+      measurementId: "G-QWREL8D39W",
+      databaseURL: "https://markmellon-world-default-rtdb.firebaseio.com"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
 
     const body = document.body;
     const clickSound = document.getElementById('clickSound');
     const cordContainer = document.getElementById('cordContainer');
     const lamp = document.getElementById('lamp');
 
-    // Lamp toggle unchanged
     function toggleLamp() {
       const isOn = body.getAttribute('data-on') === '1';
       const newOn = !isOn;
@@ -480,52 +556,58 @@
         }, 420);
       }, 10);
     }
+
     lamp.addEventListener('click', toggleLamp);
 
-    // Form elements
     const signinForm = document.getElementById('signin-form');
     const signupForm = document.getElementById('signup-form');
     const resetForm = document.getElementById('reset-form');
-    const toSignup = document.getElementById('to-signup');
-    const toSignin = document.getElementById('to-signin');
-    const forgotPassword = document.getElementById('forgot-password');
-    const backToSignin = document.getElementById('back-to-signin');
 
-    function showForm(formId) {
+    const showForm = (formId) => {
       signinForm.style.display = 'none';
       signupForm.style.display = 'none';
       resetForm.style.display = 'none';
       document.getElementById(formId).style.display = 'block';
-      clearMessages();
-    }
-
-    function clearMessages() {
       document.querySelectorAll('.message').forEach(el => el.textContent = '');
-    }
+    };
 
-    function showLoading(btn) {
+    document.getElementById('to-signup').addEventListener('click', e => { e.preventDefault(); showForm('signup-form'); });
+    document.getElementById('to-signin').addEventListener('click', e => { e.preventDefault(); showForm('signin-form'); });
+    document.getElementById('forgot-password').addEventListener('click', e => { e.preventDefault(); showForm('reset-form'); });
+    document.getElementById('back-to-signin').addEventListener('click', e => { e.preventDefault(); showForm('signin-form'); });
+
+    const showLoading = (btn) => {
       btn.disabled = true;
       btn.innerHTML = 'Loading... <div class="loading-spinner"></div>';
-    }
+    };
 
-    function hideLoading(btn, originalText) {
+    const hideLoading = (btn, text) => {
       btn.disabled = false;
-      btn.innerHTML = originalText;
-    }
+      btn.innerHTML = text;
+    };
 
-    // Switch links
-    toSignup.addEventListener('click', (e) => { e.preventDefault(); showForm('signup-form'); });
-    toSignin.addEventListener('click', (e) => { e.preventDefault(); showForm('signin-form'); });
-    forgotPassword.addEventListener('click', (e) => { e.preventDefault(); showForm('reset-form'); });
-    backToSignin.addEventListener('click', (e) => { e.preventDefault(); showForm('signin-form'); });
+    const redirectToMain = () => {
+      setTimeout(() => window.location.href = 'homepage.html', 1500);
+    };
 
-    // Sign In
-    document.getElementById('signin-btn').addEventListener('click', () => {
+    const saveUserToDatabase = (user, username = null) => {
+      const userRef = ref(db, `users/${user.uid}`);
+      const userData = {
+        uid: user.uid,
+        email: user.email,
+        displayName: username || user.displayName || '',
+        createdAt: new Date().toISOString(),
+        photoURL: user.photoURL || null
+      };
+      set(userRef, userData);
+    };
+
+    document.getElementById('signin-btn').addEventListener('click', async () => {
       const email = document.getElementById('signin-email').value.trim();
       const password = document.getElementById('signin-password').value;
       const messageEl = document.getElementById('signin-message');
       const btn = document.getElementById('signin-btn');
-      const originalText = btn.innerHTML;
+      const original = btn.innerHTML;
 
       if (!email || !password) {
         messageEl.className = 'message error';
@@ -534,30 +616,26 @@
       }
 
       showLoading(btn);
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          messageEl.className = 'message success';
-          messageEl.textContent = 'Signed in! Redirecting...';
-          setTimeout(() => {
-            window.location.href = '/'; // ← Change to your main page URL
-          }, 1500);
-        })
-        .catch((error) => {
-          messageEl.className = 'message error';
-          messageEl.textContent = error.message;
-          hideLoading(btn, originalText);
-        });
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        messageEl.className = 'message success';
+        messageEl.textContent = 'Signed in! Redirecting...';
+        redirectToMain();
+      } catch (error) {
+        messageEl.className = 'message error';
+        messageEl.textContent = error.message;
+        hideLoading(btn, original);
+      }
     });
 
-    // Sign Up
-    document.getElementById('signup-btn').addEventListener('click', () => {
+    document.getElementById('signup-btn').addEventListener('click', async () => {
       const username = document.getElementById('signup-username').value.trim();
       const email = document.getElementById('signup-email').value.trim();
       const password = document.getElementById('signup-password').value;
       const confirm = document.getElementById('signup-confirm').value;
       const messageEl = document.getElementById('signup-message');
       const btn = document.getElementById('signup-btn');
-      const originalText = btn.innerHTML;
+      const original = btn.innerHTML;
 
       if (!username || !email || !password || !confirm) {
         messageEl.className = 'message error';
@@ -576,30 +654,25 @@
       }
 
       showLoading(btn);
-      auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          userCredential.user.updateProfile({ displayName: username })
-            .then(() => {
-              messageEl.className = 'message success';
-              messageEl.textContent = 'Account created! Redirecting...';
-              setTimeout(() => {
-                window.location.href = '/'; // ← Change to your main page URL
-              }, 1500);
-            });
-        })
-        .catch((error) => {
-          messageEl.className = 'message error';
-          messageEl.textContent = error.message;
-          hideLoading(btn, originalText);
-        });
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: username });
+        saveUserToDatabase(userCredential.user, username);
+        messageEl.className = 'message success';
+        messageEl.textContent = 'Account created! Redirecting...';
+        redirectToMain();
+      } catch (error) {
+        messageEl.className = 'message error';
+        messageEl.textContent = error.message;
+        hideLoading(btn, original);
+      }
     });
 
-    // Password Reset
-    document.getElementById('reset-btn').addEventListener('click', () => {
+    document.getElementById('reset-btn').addEventListener('click', async () => {
       const email = document.getElementById('reset-email').value.trim();
       const messageEl = document.getElementById('reset-message');
       const btn = document.getElementById('reset-btn');
-      const originalText = btn.innerHTML;
+      const original = btn.innerHTML;
 
       if (!email) {
         messageEl.className = 'message error';
@@ -608,17 +681,46 @@
       }
 
       showLoading(btn);
-      auth.sendPasswordResetEmail(email)
-        .then(() => {
-          messageEl.className = 'message success';
-          messageEl.textContent = 'Password reset email sent! Check your inbox.';
-          hideLoading(btn, originalText);
-        })
-        .catch((error) => {
-          messageEl.className = 'message error';
-          messageEl.textContent = error.message;
-          hideLoading(btn, originalText);
-        });
+      try {
+        await sendPasswordResetEmail(auth, email);
+        messageEl.className = 'message success';
+        messageEl.textContent = 'Reset email sent! Check your inbox.';
+        hideLoading(btn, original);
+      } catch (error) {
+        messageEl.className = 'message error';
+        messageEl.textContent = error.message;
+        hideLoading(btn, original);
+      }
+    });
+
+    const googleProvider = new GoogleAuthProvider();
+    const githubProvider = new GithubAuthProvider();
+
+    const handleOAuth = async (provider, isSignup = false) => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        if (result.additionalUserInfo.isNewUser) {
+          saveUserToDatabase(user);
+        }
+        const messageEl = document.getElementById(isSignup ? 'signup-message' : 'signin-message');
+        messageEl.className = 'message success';
+        messageEl.textContent = `${isSignup ? 'Signed up' : 'Signed in'} successfully! Redirecting...`;
+        redirectToMain();
+      } catch (error) {
+        const messageEl = document.getElementById(isSignup ? 'signup-message' : 'signin-message');
+        messageEl.className = 'message error';
+        messageEl.textContent = error.message;
+      }
+    };
+
+    document.getElementById('google-signin').addEventListener('click', () => handleOAuth(googleProvider, false));
+    document.getElementById('google-signup').addEventListener('click', () => handleOAuth(googleProvider, true));
+    document.getElementById('github-signin').addEventListener('click', () => handleOAuth(githubProvider, false));
+    document.getElementById('github-signup').addEventListener('click', () => handleOAuth(githubProvider, true));
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) console.log('Signed in as:', user.displayName || user.email);
     });
   </script>
 

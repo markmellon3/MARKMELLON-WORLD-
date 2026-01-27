@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LabaFilm</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+  margin: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #0b0f14;
+  color: #fff;
+}
+
+/* HEADER */
+header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background: #0f1419;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+header input {
+  flex: 1;
+  padding: 8px;
+  background: #161b22;
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+}
+
+header span {
+  cursor: pointer;
+  font-size: 20px;
+}
+
+/* HERO */
+.hero {
+  height: 300px;
+  background: linear-gradient(to right, rgba(0,0,0,.8), transparent),
+    url("https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?w=1400") center/cover;
+  display: flex;
+  align-items: center;
+  padding: 30px;
+}
+
+.hero h1 {
+  font-size: 28px;
+}
+
+.hero button {
+  margin-top: 10px;
+  padding: 10px 18px;
+  background: #e50914;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* SECTIONS */
+.section {
+  padding: 20px;
+}
+
+.section h2 {
+  margin-bottom: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  cursor: pointer;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.card h4 {
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* PLAYER MODAL */
+#playerModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.9);
+  display: none;
+  flex-direction: column;
+  z-index: 999;
+}
+
+.player-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+}
+
+video {
+  width: 100%;
+  max-height: 70vh;
+  background: black;
+}
+
+.actions {
+  padding: 15px;
+}
+
+.actions button {
+  padding: 10px;
+  margin-right: 10px;
+  background: #e50914;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* LIST MODAL */
+#listModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.9);
+  display: none;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.list-item {
+  margin-bottom: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">Labafilm</div>
+  <input type="text" placeholder="Search movies or series...">
+  <span onclick="showList('favorites')">❤️</span>
+  <span onclick="showList('watchlist')">📺</span>
+</header>
+
+<section class="hero">
+  <div>
+    <h1>A Complete Unknown</h1>
+    <p>New York, early 1960s. A young musician changes everything.</p>
+    <button onclick="playItem('A Complete Unknown','Movie','movie.mp4')">▶ Watch Now</button>
+  </div>
+</section>
+
+<!-- MOVIES -->
+<section class="section">
+  <h2>Movies</h2>
+  <div class="grid">
+
+    <div class="card" onclick="playItem('Happy Gilmore','Movie','movie.mp4')">
+      <img src="https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg">
+      <h4>Happy Gilmore</h4>
+    </div>
+
+    <div class="card" onclick="playItem('Colombiana','Movie','movie.mp4')">
+      <img src="https://image.tmdb.org/t/p/w500/e7bpj7g0h7N5cRWK2dZrD3fVd1H.jpg">
+      <h4>Colombiana</h4>
+    </div>
+
+  </div>
+</section>
+
+<!-- SERIES -->
+<section class="section">
+  <h2>Series</h2>
+  <div class="grid">
+
+    <div class="card" onclick="playItem('Stranger Things S01E01','Series','series.mp4')">
+      <img src="https://image.tmdb.org/t/p/w500/56v2KjBlU4XaOv9rVYEQypROD7P.jpg">
+      <h4>Stranger Things</h4>
+    </div>
+
+    <div class="card" onclick="playItem('The Asset S01E01','Series','series.mp4')">
+      <img src="https://image.tmdb.org/t/p/w500/1tEd7e4K2I4pVvD5cJ6U9j3uZ2F.jpg">
+      <h4>The Asset</h4>
+    </div>
+
+  </div>
+</section>
+
+<!-- PLAYER -->
+<div id="playerModal">
+  <div class="player-header">
+    <h3 id="playTitle"></h3>
+    <button onclick="closePlayer()">✖</button>
+  </div>
+
+  <video id="video" controls autoplay></video>
+
+  <div class="actions">
+    <button onclick="addFavorite()">❤️ Favorite</button>
+    <button onclick="addWatch()">➕ Watchlist</button>
+  </div>
+</div>
+
+<!-- FAVORITES / WATCHLIST -->
+<div id="listModal">
+  <button onclick="closeList()">⬅ Back</button>
+  <h2 id="listTitle"></h2>
+  <div id="listContent"></div>
+</div>
+
+<script>
+const WATCHMODE_KEY = "GQaQUSgQ3YWchTERjggqepavqNyKu4n1whA7MWVi";
+const TASTEDIVE_KEY = "1067845-MarkMell-1ECB9746";
+
+let current = {};
+
+// ================= FETCH MOVIES =================
+async function loadMovies() {
+  const res = await fetch(
+    `https://api.watchmode.com/v1/list-titles/?apiKey=${WATCHMODE_KEY}&types=movie&limit=12`
+  );
+  const data = await res.json();
+  renderMovies(data.titles);
+}
+
+// ================= FETCH SERIES =================
+async function loadSeries() {
+  const res = await fetch(
+    `https://api.watchmode.com/v1/list-titles/?apiKey=${WATCHMODE_KEY}&types=tv_series&limit=12`
+  );
+  const data = await res.json();
+  renderSeries(data.titles);
+}
+
+// ================= RENDER =================
+function renderMovies(items) {
+  const grid = document.querySelector(".section .grid");
+  grid.innerHTML = "";
+
+  items.forEach(m => {
+    grid.innerHTML += `
+      <div class="card" onclick="playItem('${m.title}','Movie','')">
+        <img src="${m.poster || 'https://via.placeholder.com/300x450'}">
+        <h4>${m.title}</h4>
+      </div>
+    `;
+  });
+}
+
+function renderSeries(items) {
+  const grids = document.querySelectorAll(".grid")[1];
+  grids.innerHTML = "";
+
+  items.forEach(s => {
+    grids.innerHTML += `
+      <div class="card" onclick="playItem('${s.title}','Series','')">
+        <img src="${s.poster || 'https://via.placeholder.com/300x450'}">
+        <h4>${s.title}</h4>
+      </div>
+    `;
+  });
+}
+
+// ================= PLAYER =================
+function playItem(title, type, src) {
+  current = { title, type, src };
+  document.getElementById("playTitle").innerText = title;
+  document.getElementById("video").src = src || "";
+  document.getElementById("playerModal").style.display = "flex";
+  loadRecommendations(title);
+}
+
+function closePlayer() {
+  document.getElementById("playerModal").style.display = "none";
+  document.getElementById("video").pause();
+}
+
+// ================= FAVORITES =================
+function addFavorite() {
+  let favs = JSON.parse(localStorage.getItem("favorites")) || [];
+  favs.push(current);
+  localStorage.setItem("favorites", JSON.stringify(favs));
+  alert("Added to Favorites ❤️");
+}
+
+function addWatch() {
+  let list = JSON.parse(localStorage.getItem("watchlist")) || [];
+  list.push(current);
+  localStorage.setItem("watchlist", JSON.stringify(list));
+  alert("Added to Watchlist 📺");
+}
+
+// ================= LISTS =================
+function showList(type) {
+  let items = JSON.parse(localStorage.getItem(type)) || [];
+  document.getElementById("listTitle").innerText =
+    type === "favorites" ? "Favorites" : "Watchlist";
+
+  document.getElementById("listContent").innerHTML =
+    items.map(i => `<div class="list-item">${i.title}</div>`).join("") || "Empty";
+
+  document.getElementById("listModal").style.display = "block";
+}
+
+function closeList() {
+  document.getElementById("listModal").style.display = "none";
+}
+
+// ================= TASTEDIVE =================
+async function loadRecommendations(title) {
+  const res = await fetch(
+    `https://tastedive.com/api/similar?q=${encodeURIComponent(title)}&type=movies&limit=5&k=${TASTEDIVE_KEY}`
+  );
+  const data = await res.json();
+  console.log("Recommendations:", data.Similar.Results);
+}
+
+// ================= INIT =================
+loadMovies();
+loadSeries();
+</script>
+
+</body>
+</html>

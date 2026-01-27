@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>markmellon world Login</title>
+  <style>
+    :root {
+      --on: 0;
+      --bg-off: #0f1419;
+      --bg-on: #161b22;
+      --glow-color: #ffe066;
+      --text-color: #f1f5f9;
+      --muted: #94a3b8;
+      --pull-duration: 0.7s;
+      --primary: #facc15;
+      --primary-dark: #ea580c;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-off);
+      color: var(--text-color);
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(1rem, 4vw, 1.5rem);
+      transition: background 0.8s ease;
+    }
+
+    body[data-on="1"] {
+      background: var(--bg-on);
+      --on: 1;
+    }
+
+    .title {
+      font-size: clamp(2.2rem, 8vw, 3.5rem);
+      margin-bottom: clamp(1.5rem, 5vw, 2.5rem);
+      text-shadow: 0 0 12px rgba(255,255,255,0.25);
+      text-align: center;
+    }
+
+    .scene {
+      display: flex;
+      align-items: flex-end;
+      gap: clamp(3rem, 8vw, 9rem);
+      max-width: 1000px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Lamp styles unchanged */
+    .lamp {
+      position: relative;
+      width: clamp(220px, 45vw, 300px);
+      height: clamp(340px, 70vw, 460px);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .shade {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 82%;
+      height: 32%;
+      background: linear-gradient(to bottom, #f5f5f5, #e5e5e5);
+      border-radius: 50% 50% 35% 35% / 100% 100% 0 0;
+      box-shadow: inset 0 10px 20px rgba(0,0,0,0.2),
+                  0 10px 20px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .bulb {
+      position: absolute;
+      bottom: -55%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 38%;
+      aspect-ratio: 1;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 
+        inset 0 0 30px rgba(0,0,0,0.45),
+        0 0 45px var(--glow-color),
+        0 0 90px var(--glow-color);
+      opacity: var(--on);
+      transition: opacity 0.8s ease, box-shadow 0.8s ease;
+    }
+
+    body[data-on="0"] .bulb {
+      background: #888;
+      box-shadow: inset 0 0 30px #444;
+      opacity: 0.65;
+    }
+
+    .stem {
+      position: absolute;
+      top: 28%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 5%;
+      height: 52%;
+      background: linear-gradient(#666, #222);
+      border-radius: 6px;
+    }
+
+    .base {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      height: 8%;
+      background: #222;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+    }
+
+    .cord-container {
+      position: absolute;
+      top: 22%;
+      left: 70%;
+      width: 3px;
+      height: 58%;
+      transform-origin: top;
+      transition: transform var(--pull-duration) cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    .cord {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #555;
+    }
+
+    .cord::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 10px;
+      background: #555;
+      border-radius: 50%;
+    }
+
+    .ball {
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: clamp(32px, 9vw, 40px);
+      height: clamp(32px, 9vw, 40px);
+      background: #f59e0b;
+      border-radius: 50%;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.5),
+                  inset 0 -5px 10px rgba(0,0,0,0.4);
+      transition: transform 0.15s ease;
+    }
+
+    .ball:active {
+      transform: translateX(-50%) scale(0.92);
+    }
+
+    .cord-container.pulling {
+      transform: translateY(35px);
+      transition-duration: calc(var(--pull-duration) * 0.6);
+    }
+
+    .cord-container.releasing {
+      transform: translateY(0);
+      transition-duration: calc(var(--pull-duration) * 0.4);
+    }
+
+    /* Login/Signup Card */
+    .login-card {
+      background: #17202a;
+      padding: clamp(1.8rem, 5vw, 3.2rem) clamp(1.5rem, 4vw, 2.8rem);
+      border-radius: 16px;
+      width: clamp(320px, 85vw, 380px);
+      max-width: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.65);
+      text-align: center;
+      transition: all 0.8s ease;
+      opacity: var(--on);
+      pointer-events: var(--on, none);
+      position: relative;
+    }
+
+    body[data-on="0"] .login-card {
+      opacity: 0.22;
+      filter: blur(3.5px);
+      transform: scale(0.95);
+    }
+
+    .form-container h1 {
+      margin-bottom: 2rem;
+      font-size: clamp(1.8rem, 6vw, 2.4rem);
+    }
+
+    .form-group {
+      margin-bottom: 1.4rem;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.55rem;
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    input {
+      width: 100%;
+      padding: 0.95rem 1rem;
+      background: #1f2a3a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: white;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    input::placeholder {
+      color: #64748b;
+    }
+
+    button {
+      width: 100%;
+      padding: 1.1rem;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      margin-top: 1rem;
+      position: relative;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .toggle-link {
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .toggle-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .toggle-link a:hover {
+      text-decoration: underline;
+    }
+
+    .message {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .success { color: var(--success); }
+    .error { color: var(--error); }
+
+    /* Loading spinner */
+    .loading-spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border: 5px solid rgba(255,255,255,0.1);
+      border-top: 5px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      z-index: 10;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .credit {
+      margin-top: 3rem;
+      color: #64748b;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .scene {
+        flex-direction: column;
+        align-items: center;
+        gap: 3rem;
+      }
+      .lamp {
+        margin-bottom: 1rem;
+      }
+      .login-card {
+        width: 100%;
+        max-width: 420px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 1rem;
+      }
+      .title {
+        font-size: 2.4rem;
+      }
+      .lamp {
+        width: 260px;
+        height: 400px;
+      }
+    }
+  </style>
+</head>
+<body data-on="0">
+
+  <div class="title">Lamp-login</div>
+
+  <div class="scene">
+    <div class="lamp" id="lamp">
+      <div class="shade">
+        <div class="bulb"></div>
+      </div>
+      <div class="stem"></div>
+      <div class="base"></div>
+      <div class="cord-container" id="cordContainer">
+        <div class="cord">
+          <div class="ball"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-card">
+      <!-- Sign In Form -->
+      <div id="signin-form" class="form-container">
+        <h1>Welcome Back</h1>
+        <div class="form-group">
+          <label for="signin-email">Email</label>
+          <input type="email" id="signin-email" placeholder="email@example.com" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="signin-password">Password</label>
+          <input type="password" id="signin-password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <button id="signin-btn">Sign In</button>
+        <a id="forgot-password" style="display:block; margin-top:1rem; font-size:0.9rem; color:var(--primary); cursor:pointer;">Forgot password?</a>
+        <div class="toggle-link">
+          Don't have an account? <a id="to-signup">Sign Up</a>
+        </div>
+        <div id="signin-message" class="message"></div>
+      </div>
+
+      <!-- Sign Up Form -->
+      <div id="signup-form" class="form-container" style="display: none;">
+        <h1>Create Account</h1>
+        <div class="form-group">
+          <label for="signup-username">Username</label>
+          <input type="text" id="signup-username" placeholder="username" autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" placeholder="email@example.com" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" placeholder="••••••••" autocomplete="new-password" />
+        </div>
+        <div class="form-group">
+          <label for="signup-confirm">Confirm Password</label>
+          <input type="password" id="signup-confirm" placeholder="••••••••" autocomplete="new-password" />
+        </div>
+        <button id="signup-btn">Sign Up</button>
+        <div class="toggle-link">
+          Already have an account? <a id="to-signin">Sign In</a>
+        </div>
+        <div id="signup-message" class="message"></div>
+      </div>
+
+      <!-- Password Reset Section -->
+      <div id="reset-form" class="form-container" style="display: none;">
+        <h1>Reset Password</h1>
+        <div class="form-group">
+          <label for="reset-email">Email</label>
+          <input type="email" id="reset-email" placeholder="email@example.com" autocomplete="email" />
+        </div>
+        <button id="reset-btn">Send Reset Email</button>
+        <div class="toggle-link">
+          <a id="back-to-signin">Back to Sign In</a>
+        </div>
+        <div id="reset-message" class="message"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="credit">@markmellonworld</div>
+
+  <!-- Optional click sound -->
+  <audio id="clickSound" preload="auto">
+    <source src="https://assets.codepen.io/605876/click.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Firebase SDK (compat version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+
+  <script>
+    // REPLACE WITH YOUR ACTUAL FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    const body = document.body;
+    const clickSound = document.getElementById('clickSound');
+    const cordContainer = document.getElementById('cordContainer');
+    const lamp = document.getElementById('lamp');
+
+    // Lamp toggle unchanged
+    function toggleLamp() {
+      const isOn = body.getAttribute('data-on') === '1';
+      const newOn = !isOn;
+
+      if (clickSound) {
+        clickSound.currentTime = 0;
+        clickSound.play().catch(() => {});
+      }
+
+      cordContainer.classList.remove('pulling', 'releasing');
+      setTimeout(() => {
+        cordContainer.classList.add('pulling');
+        setTimeout(() => {
+          cordContainer.classList.remove('pulling');
+          cordContainer.classList.add('releasing');
+          body.setAttribute('data-on', newOn ? '1' : '0');
+          setTimeout(() => {
+            cordContainer.classList.remove('releasing');
+          }, 700);
+        }, 420);
+      }, 10);
+    }
+    lamp.addEventListener('click', toggleLamp);
+
+    // Form elements
+    const signinForm = document.getElementById('signin-form');
+    const signupForm = document.getElementById('signup-form');
+    const resetForm = document.getElementById('reset-form');
+    const toSignup = document.getElementById('to-signup');
+    const toSignin = document.getElementById('to-signin');
+    const forgotPassword = document.getElementById('forgot-password');
+    const backToSignin = document.getElementById('back-to-signin');
+
+    function showForm(formId) {
+      signinForm.style.display = 'none';
+      signupForm.style.display = 'none';
+      resetForm.style.display = 'none';
+      document.getElementById(formId).style.display = 'block';
+      clearMessages();
+    }
+
+    function clearMessages() {
+      document.querySelectorAll('.message').forEach(el => el.textContent = '');
+    }
+
+    function showLoading(btn) {
+      btn.disabled = true;
+      btn.innerHTML = 'Loading... <div class="loading-spinner"></div>';
+    }
+
+    function hideLoading(btn, originalText) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+
+    // Switch links
+    toSignup.addEventListener('click', (e) => { e.preventDefault(); showForm('signup-form'); });
+    toSignin.addEventListener('click', (e) => { e.preventDefault(); showForm('signin-form'); });
+    forgotPassword.addEventListener('click', (e) => { e.preventDefault(); showForm('reset-form'); });
+    backToSignin.addEventListener('click', (e) => { e.preventDefault(); showForm('signin-form'); });
+
+    // Sign In
+    document.getElementById('signin-btn').addEventListener('click', () => {
+      const email = document.getElementById('signin-email').value.trim();
+      const password = document.getElementById('signin-password').value;
+      const messageEl = document.getElementById('signin-message');
+      const btn = document.getElementById('signin-btn');
+      const originalText = btn.innerHTML;
+
+      if (!email || !password) {
+        messageEl.className = 'message error';
+        messageEl.textContent = 'Please fill in all fields';
+        return;
+      }
+
+      showLoading(btn);
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          messageEl.className = 'message success';
+          messageEl.textContent = 'Signed in! Redirecting...';
+          setTimeout(() => {
+            window.location.href = '/'; // ← Change to your main page URL
+          }, 1500);
+        })
+        .catch((error) => {
+          messageEl.className = 'message error';
+          messageEl.textContent = error.message;
+          hideLoading(btn, originalText);
+        });
+    });
+
+    // Sign Up
+    document.getElementById('signup-btn').addEventListener('click', () => {
+      const username = document.getElementById('signup-username').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-confirm').value;
+      const messageEl = document.getElementById('signup-message');
+      const btn = document.getElementById('signup-btn');
+      const originalText = btn.innerHTML;
+
+      if (!username || !email || !password || !confirm) {
+        messageEl.className = 'message error';
+        messageEl.textContent = 'Please fill in all fields';
+        return;
+      }
+      if (password !== confirm) {
+        messageEl.className = 'message error';
+        messageEl.textContent = 'Passwords do not match';
+        return;
+      }
+      if (password.length < 6) {
+        messageEl.className = 'message error';
+        messageEl.textContent = 'Password must be at least 6 characters';
+        return;
+      }
+
+      showLoading(btn);
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          userCredential.user.updateProfile({ displayName: username })
+            .then(() => {
+              messageEl.className = 'message success';
+              messageEl.textContent = 'Account created! Redirecting...';
+              setTimeout(() => {
+                window.location.href = '/'; // ← Change to your main page URL
+              }, 1500);
+            });
+        })
+        .catch((error) => {
+          messageEl.className = 'message error';
+          messageEl.textContent = error.message;
+          hideLoading(btn, originalText);
+        });
+    });
+
+    // Password Reset
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      const email = document.getElementById('reset-email').value.trim();
+      const messageEl = document.getElementById('reset-message');
+      const btn = document.getElementById('reset-btn');
+      const originalText = btn.innerHTML;
+
+      if (!email) {
+        messageEl.className = 'message error';
+        messageEl.textContent = 'Please enter your email';
+        return;
+      }
+
+      showLoading(btn);
+      auth.sendPasswordResetEmail(email)
+        .then(() => {
+          messageEl.className = 'message success';
+          messageEl.textContent = 'Password reset email sent! Check your inbox.';
+          hideLoading(btn, originalText);
+        })
+        .catch((error) => {
+          messageEl.className = 'message error';
+          messageEl.textContent = error.message;
+          hideLoading(btn, originalText);
+        });
+    });
+  </script>
+
+</body>
+</html>

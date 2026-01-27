@@ -387,11 +387,50 @@
         height: 28px;
       }
     }
+    .title {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Space between words and flame */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Responsive text size */
+.title span {
+    font-weight: 700;
+    font-size: clamp(24px, 5vw, 48px); /* Minimum 24px, maximum 48px, scales with viewport */
+    background: linear-gradient(90deg, #ff4b2b, #ff416c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+}
+
+.title span:hover {
+    color: #ff416c;
+}
+
+/* Flame image */
+.flame-icon {
+    width: clamp(30px, 5vw, 60px); /* Responsive flame size */
+    height: clamp(30px, 5vw, 60px);
+    border-radius: 50%; /* Circular */
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.3s;
+}
+
+.flame-icon:hover {
+    transform: scale(1.2);
+} 
   </style>
 </head>
 <body data-on="1">
 
-<h2> <div class="title">MARKMELLONS WORLD </div></h2>
+div class="title">
+  <span>PLACE OF </span>
+  <img src="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" alt="Flame" class="flame-icon">
+  <span>WONDERS</span>
+</div>
 
   <div class="scene">
     <div class="lamp" id="lamp">

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home - MARK MELLON WORLD </title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #17202a;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #facc15;
+      --primary-dark: #ea580c;
+      --success: #10b981;
+      --error: #ef4444;
+      --border: #334155;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 1rem;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 6vw, 2.4rem);
+    }
+
+    .hamburger {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: var(--primary);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    /* Sidebar / Drawer */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: -320px;
+      width: 320px;
+      height: 100%;
+      background: var(--card);
+      box-shadow: -4px 0 20px rgba(0,0,0,0.6);
+      transition: right 0.35s ease;
+      z-index: 1000;
+      padding: 2rem 1.5rem;
+      overflow-y: auto;
+    }
+
+    .sidebar.open {
+      right: 0;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+    }
+
+    .sidebar p {
+      margin: 0.8rem 0;
+      color: var(--muted);
+    }
+
+    .sidebar label {
+      display: block;
+      margin: 1rem 0 0.4rem;
+      font-weight: 500;
+    }
+
+    .sidebar input {
+      width: 100%;
+      padding: 0.8rem;
+      background: #1f2a3a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: white;
+    }
+
+    .sidebar button {
+      width: 100%;
+      padding: 0.9rem;
+      margin: 1rem 0;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #0f172a;
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+
+    /* Main content */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+      background: #1f2a3a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .search-bar:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(250,204,21,0.2);
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+      background: var(--card);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .results-table th,
+    .results-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .results-table th {
+      background: #1f2a3a;
+      color: var(--primary);
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.2rem;
+      margin-top: 2rem;
+    }
+
+    .category-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.8rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .category-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 25px rgba(250,204,21,0.15);
+    }
+
+    .category-card h3 {
+      margin-top: 1rem;
+      color: var(--primary);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .modal-content {
+      background: var(--card);
+      border-radius: 16px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .website-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .website-card {
+      background: #1f2a3a;
+      border-radius: 10px;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .website-card h4 {
+      margin-bottom: 0.6rem;
+      color: var(--primary);
+    }
+
+    .website-card a {
+      color: #60a5fa;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .website-card a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .category-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    <!-- flame -->
+   .site-header {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centers header content */
+  position: relative;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;          /* tight spacing */
+  margin: 0;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Optional: keep hamburger on the right */
+.hamburger {
+  position: absolute;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+
+  </style>
+</head>
+<body>
+<div class="container">
+  <header class="site-header">
+    <h1 class="brand">
+      <span>MARKMELLONS</span>
+      <img 
+        src="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" 
+        alt="Flame Logo"
+        class="logo"
+      />
+      <span>WORLD</span>
+      
+    </h1>
+
+    <button class="hamburger" id="sidebar-toggle">☰</button>
+  </header>
+</div>
+    </header>
+
+    <input type="text" id="search-input" class="search-bar" placeholder="Search websites (name or description)..." />
+
+    <div id="search-results" style="min-height: 100px;"></div>
+
+
+  <!-- Mobile Sidebar -->
+<div class="sidebar" id="sidebar">
+  <h2>Profile</h2>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+  <button class="nav-btn" onclick="location.href='homepage.html'">🏠 Home</button>
+  <button class="nav-btn" onclick="location.href='photos.html'">🖼️ Photos</button>
+  <button class="nav-btn" onclick="location.href='about.html'">ℹ️ About</button>
+  <button class="nav-btn" onclick="location.href='contact.html'">📞 Contact</button>
+  <button class="nav-btn" onclick="location.href='help.html'">❓ Help</button>
+</nav>
+
+  <hr />
+
+  <p><strong>Email:</strong> <span id="user-email">—</span></p>
+  <p><strong>Name:</strong> <span id="user-display-name">—</span></p>
+
+  <label for="edit-display-name">Change Name</label>
+  <input type="text" id="edit-display-name" placeholder="New display name" />
+
+  <button class="btn-primary" id="save-name-btn">Save Name</button>
+
+  <div id="profile-message" class="message" style="margin-top:1rem; min-height:1.4em;"></div>
+
+  <button class="btn-danger" id="logout-btn" style="margin-top:2rem;">Sign Out</button>
+</div>
+
+  <!-- Category Modal -->
+  <div class="modal" id="category-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">Category</h2>
+        <button class="close-btn" id="close-modal">×</button>
+      </div>
+      <div id="websites-container" class="website-grid"></div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged,
+      updateProfile,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAD0QJvrnC0zxnGnbfVg3Y74Tffy6rxjmU",
+      authDomain: "markmellon-world.firebaseapp.com",
+      projectId: "markmellon-world",
+      storageBucket: "markmellon-world.firebasestorage.app",
+      messagingSenderId: "414939524675",
+      appId: "1:414939524675:web:c98e0f4d301d933d1d6ef6",
+      measurementId: "G-QWREL8D39W",
+      databaseURL: "https://markmellon-world-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+   
+
+    // ─────────────────────────────────────────────
+    // Auth & UI sync
+    // ─────────────────────────────────────────────
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "index.html"; // or your login page
+        return;
+      }
+
+      document.getElementById("user-email").textContent = user.email;
+      document.getElementById("user-display-name").textContent = user.displayName || "No name set";
+      document.getElementById("edit-display-name").value = user.displayName || "";
+    });
+
+    // Update display name
+    document.getElementById("save-name-btn").onclick = async () => {
+      const newName = document.getElementById("edit-display-name").value.trim();
+      const msgEl = document.getElementById("profile-message");
+
+      if (!newName) {
+        msgEl.className = "error";
+        msgEl.textContent = "Please enter a name";
+        return;
+      }
+
+      try {
+        await updateProfile(auth.currentUser, { displayName: newName });
+        // Optional: save to Realtime DB if you want extra copy
+        await set(ref(db, `users/${auth.currentUser.uid}/displayName`), newName);
+        msgEl.className = "success";
+        msgEl.textContent = "Name updated successfully";
+        document.getElementById("user-display-name").textContent = newName;
+      } catch (err) {
+        msgEl.className = "error";
+        msgEl.textContent = err.message;
+      }
+    };
+
+    // Logout
+    document.getElementById("logout-btn").onclick = async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    };
+
+    // ─────────────────────────────────────────────
+    // Sidebar (mobile)
+    // ─────────────────────────────────────────────
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("sidebar-toggle");
+
+    toggleBtn.onclick = () => {
+      sidebar.classList.toggle("open");
+    };
+
+    // Close sidebar when clicking outside
+    document.addEventListener("click", e => {
+      if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+        sidebar.classList.remove("open");
+      }
+    });
+
+    // ─────────────────────────────────────────────
+    // Search
+    // ─────────────────────────────────────────────
+    const searchInput = document.getElementById("search-input");
+    const resultsDiv = document.getElementById("search-results");
+
+    searchInput.oninput = () => {
+      const q = searchInput.value.toLowerCase().trim();
+      resultsDiv.innerHTML = "";
+
+      if (!q) return;
+
+      let found = [];
+
+      Object.entries(categories).forEach(([cat, sites]) => {
+        sites.forEach(site => {
+          if (site.name.toLowerCase().includes(q) || site.desc.toLowerCase().includes(q)) {
+            found.push({ ...site, category: cat });
+          }
+        });
+      });
+
+      if (found.length === 0) {
+        resultsDiv.innerHTML = "<p style='color:var(--muted);'>No results found.</p>";
+        return;
+      }
+
+      let html = `<table class="results-table">
+        <thead><tr><th>Name</th><th>Category</th><th>Description</th><th>Link</th></tr></thead>
+        <tbody>`;
+
+      found.forEach(item => {
+        html += `<tr>
+          <td>${item.name}</td>
+          <td style="text-transform:capitalize;">${item.category}</td>
+          <td>${item.desc}</td>
+          <td><a href="${item.url}" target="_blank" style="color:#60a5fa;">Visit</a></td>
+        </tr>`;
+      });
+
+      html += "</tbody></table>";
+      resultsDiv.innerHTML = html;
+    };
+
+    // ─────────────────────────────────────────────
+    // Categories modal
+    // ─────────────────────────────────────────────
+    const modal = document.getElementById("category-modal");
+    const modalTitle = document.getElementById("modal-title");
+    const websitesContainer = document.getElementById("websites-container");
+    const closeModal = document.getElementById("close-modal");
+
+    document.querySelectorAll(".category-card").forEach(card => {
+      card.onclick = () => {
+        const cat = card.dataset.category;
+        modalTitle.textContent = card.querySelector("h3").textContent;
+
+        websitesContainer.innerHTML = "";
+
+        (categories[cat] || []).forEach(site => {
+          websitesContainer.innerHTML += `
+            <div class="website-card">
+              <h4>${site.name}</h4>
+              <p>${site.desc}</p>
+              <a href="${site.url}" target="_blank">Visit site →</a>
+            </div>
+          `;
+        });
+
+        modal.style.display = "flex";
+      };
+    });
+
+    closeModal.onclick = () => modal.style.display = "none";
+    modal.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
+  </script>
+</body>
+</html>

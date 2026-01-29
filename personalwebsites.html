@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Personal Websites</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+  --bg-dark: rgba(0,0,0,.75);
+  --card-bg: #111827;
+  --accent: #22c55e;
+  --danger: #ef4444;
+}
+
+* { box-sizing: border-box; font-family: Arial, sans-serif; }
+
+body {
+  margin: 0;
+  color: #fff;
+  background:
+    linear-gradient(var(--bg-dark), var(--bg-dark)),
+    url("https://i.ibb.co/HLqY8XV6/f91069549350df8fc256a5309e70294b.webp");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+header {
+  padding: 30px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+header p {
+  color: #ccc;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 20px;
+  padding: 25px;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,.5);
+  transition: transform .25s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+}
+
+.card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 15px;
+}
+
+.card h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+}
+
+.card p {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.price-box {
+  margin-bottom: 10px;
+}
+
+.price {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--accent);
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #888;
+  margin-left: 8px;
+}
+
+.discount {
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.actions button {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.view {
+  background: #1f2933;
+  color: #fff;
+}
+
+.buy {
+  background: var(--accent);
+  color: #000;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Personal Website Templates</h1>
+  <p>Choose a ready-built personal website</p>
+</header>
+
+<div class="grid" id="websiteGrid"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAD0QJvrnC0zxnGnbfVg3Y74Tffy6rxjmU",
+  authDomain: "markmellon-world.firebaseapp.com",
+  databaseURL: "https://markmellon-world-default-rtdb.firebaseio.com",
+  projectId: "markmellon-world",
+  storageBucket: "markmellon-world.firebasestorage.app",
+  messagingSenderId: "414939524675",
+  appId: "1:414939524675:web:c98e0f4d301d933d1d6ef6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const grid = document.getElementById("websiteGrid");
+const websitesRef = ref(db, "personal_websites");
+
+// Function to encode data safely for URL
+function encodeDataForURL(data) {
+  return encodeURIComponent(data || "");
+}
+
+onValue(websitesRef, snapshot => {
+  grid.innerHTML = "";
+  snapshot.forEach(child => {
+    const data = child.val();
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <img src="${data.image}">
+      <div class="card-content">
+        <h3>${data.title}</h3>
+        <p>${data.description || "No description available"}</p>
+        <div class="price-box">
+          <span class="price">$${data.price}</span>
+          <span class="old-price">$${data.oldPrice}</span>
+          <div class="discount">${data.discount} OFF</div>
+        </div>
+        <div class="actions">
+          <button class="view">View</button>
+          <button class="buy">Buy</button>
+        </div>
+      </div>
+    `;
+
+    // Open demo in new tab
+    card.querySelector(".view").onclick = () => {
+      window.open(data.demoUrl, "_blank");
+    };
+
+    // Redirect to payment page with all website info
+    card.querySelector(".buy").onclick = () => {
+      // Replace with your payment page URL
+      const paymentPage = "payment.html";
+      
+      // Construct URL with encoded parameters
+      const params = new URLSearchParams({
+        title: encodeDataForURL(data.title),
+        price: encodeDataForURL(data.price),
+        image: encodeDataForURL(data.image),
+        description: encodeDataForURL(data.description),
+        paymentUrl: encodeDataForURL(data.paymentUrl)
+      });
+
+      window.location.href = `${paymentPage}?${params.toString()}`;
+    };
+
+    grid.appendChild(card);
+  });
+});
+</script>
+
+</body>
+</html>

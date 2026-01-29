@@ -398,5 +398,88 @@ document.querySelectorAll('.buy-btn').forEach(btn => {
 */
 </script>
 <!-- END INFO CARDS SECTION -->
+  <!-- MAINTENANCE MODE OVERLAY -->
+<div id="maintenanceOverlay">
+  <div class="maintenance-box">
+    <h1>Maintenance Mode</h1>
+    <p id="maintenanceText"></p>
+  </div>
+</div>
+
+<style>
+#maintenanceOverlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  z-index: 999999;
+}
+
+#maintenanceOverlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,.65);
+}
+
+.maintenance-box {
+  position: relative;
+  text-align: center;
+  color: #fff;
+  padding: 40px;
+  max-width: 420px;
+}
+
+.maintenance-box h1 {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+</style>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+/* ======================
+   FIREBASE INIT
+====================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyAD0QJvrnC0zxnGnbfVg3Y74Tffy6rxjmU",
+  authDomain: "markmellon-world.firebaseapp.com",
+  databaseURL: "https://markmellon-world-default-rtdb.firebaseio.com",
+  projectId: "markmellon-world",
+  storageBucket: "markmellon-world.firebasestorage.app",
+  messagingSenderId: "414939524675",
+  appId: "1:414939524675:web:c98e0f4d301d933d1d6ef6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const maintenanceRef = ref(db, "MaintenanceMode");
+
+/* ======================
+   MAINTENANCE LISTENER
+====================== */
+onValue(maintenanceRef, snap => {
+  if (!snap.exists()) return;
+
+  const data = snap.val();
+  const overlay = document.getElementById("maintenanceOverlay");
+
+  if (data.enabled) {
+    overlay.style.display = "flex";
+    overlay.style.backgroundImage = `url('${data.background || ""}')`;
+    document.getElementById("maintenanceText").textContent = data.message || "We’ll be back soon!";
+    document.body.style.overflow = "hidden";
+  } else {
+    overlay.style.display = "none";
+    document.body.style.overflow = "";
+  }
+});
+</script>
 </body>
 </html>

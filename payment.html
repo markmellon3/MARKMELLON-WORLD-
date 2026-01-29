@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Website Payment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" sizes="96x96" />
+<link rel="icon" type="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" href="/favicon.svg" />
+<link rel="shortcut icon" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" />
+<link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" />
+<meta name="apple-mobile-web-app-title" content="MyWebSite" />
+<link rel="manifest" href="/site.webmanifest" />
+<style>
+:root {
+  --bg-dark: rgba(0,0,0,.85);
+  --card-bg: #111827;
+  --accent: #22c55e;
+  --danger: #ef4444;
+  --btn-hover: #1f2933;
+}
+
+* { box-sizing: border-box; font-family: Arial, sans-serif; }
+
+body {
+  margin: 0;
+  color: #fff;
+  background: linear-gradient(var(--bg-dark), var(--bg-dark)), url("https://i.ibb.co/HLqY8XV6/f91069549350df8fc256a5309e70294b.webp");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+header { text-align: center; margin-bottom: 20px; }
+header h1 { margin: 0; font-size: 28px; }
+header p { color: #ccc; }
+
+.container {
+  max-width: 700px;
+  margin: auto;
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.5);
+}
+
+.website-preview {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.website-preview img {
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.website-info h3 { margin: 0 0 5px 0; }
+.website-info p { font-size: 14px; color: #ccc; margin: 0 0 5px 0; }
+.website-info .price { font-weight: bold; color: var(--accent); }
+
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  align-items: center;
+}
+
+form input, form select {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+form .full { grid-column: 1/3; }
+
+.domain-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  grid-column: 1/3;
+}
+
+.domain-buttons button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  background: var(--btn-hover);
+  color: #fff;
+  transition: background .2s;
+}
+
+.domain-buttons button.active {
+  background: var(--accent);
+  color: #000;
+}
+
+#customDomain { grid-column: 1/3; }
+
+button.send-btn, button.pay-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button.send-btn {
+  grid-column: 1/2;
+  background: var(--accent);
+  color: #000;
+}
+
+button.pay-btn {
+  grid-column: 2/3;
+  background: #3b82f6;
+  color: #fff;
+}
+
+.status {
+  margin-top: 10px;
+  text-align: center;
+  color: var(--accent);
+  font-weight: bold;
+  grid-column: 1/3;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Website Purchase</h1>
+  <p>Fill the form below to complete your purchase</p>
+</header>
+
+<div class="container">
+  <!-- Website Info Preview -->
+  <div class="website-preview">
+    <img id="siteImage" src="" alt="Website Image">
+    <div class="website-info">
+      <h3 id="siteTitle"></h3>
+      <p id="siteDescription"></p>
+      <p class="price" id="sitePrice"></p>
+    </div>
+  </div>
+
+  <!-- Purchase Form -->
+  <form id="purchaseForm">
+    <input id="firstName" placeholder="First Name" required>
+    <input id="lastName" placeholder="Last Name" required>
+    <input id="email" placeholder="Email" type="email" required>
+    <select id="country" class="full" required>
+      <option value="">Select Country</option>
+      <option value="USA">USA</option>
+      <option value="UK">UK</option>
+      <option value="France">France</option>
+      <option value="Germany">Germany</option>
+      <option value="Canada">Canada</option>
+      <option value="Other">Other</option>
+    </select>
+    <input id="phone" placeholder="Phone Number" required>
+    <input id="city" placeholder="City / State" required>
+
+    <label class="full">Choose Domain or type your own</label>
+    <div class="domain-buttons">
+      <button type="button" data-domain=".site">.site</button>
+      <button type="button" data-domain=".shop">.shop</button>
+      <button type="button" data-domain=".com">.com</button>
+    </div>
+    <input id="customDomain" placeholder="Or type custom domain">
+
+    <button type="submit" class="send-btn">Send Info</button>
+    <button type="button" class="pay-btn" id="payBtn">Pay Now</button>
+
+    <div class="status" id="status"></div>
+  </form>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAD0QJvrnC0zxnGnbfVg3Y74Tffy6rxjmU",
+  authDomain: "markmellon-world.firebaseapp.com",
+  databaseURL: "https://markmellon-world-default-rtdb.firebaseio.com",
+  projectId: "markmellon-world",
+  storageBucket: "markmellon-world.firebasestorage.app",
+  messagingSenderId: "414939524675",
+  appId: "1:414939524675:web:c98e0f4d301d933d1d6ef6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Read URL parameters
+const params = new URLSearchParams(window.location.search);
+const websiteData = {
+  title: params.get("title") || "Unknown",
+  price: params.get("price") || "0",
+  image: params.get("image") || "",
+  description: params.get("description") || ""
+};
+
+// Show website preview
+document.getElementById("siteTitle").textContent = websiteData.title;
+document.getElementById("siteDescription").textContent = websiteData.description;
+document.getElementById("sitePrice").textContent = "$" + websiteData.price;
+document.getElementById("siteImage").src = websiteData.image;
+
+// Domain buttons logic
+const domainButtons = document.querySelectorAll(".domain-buttons button");
+let selectedDomain = "";
+domainButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    selectedDomain = btn.dataset.domain;
+    domainButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("customDomain").value = "";
+  });
+});
+
+// Form submission (Send Info)
+const form = document.getElementById("purchaseForm");
+const status = document.getElementById("status");
+
+function submitOrder() {
+  // If custom domain filled, it overrides button selection
+  let domainValue = document.getElementById("customDomain").value.trim() || selectedDomain;
+
+  if(!domainValue){
+    alert("Please select or type a preferred domain!");
+    return;
+  }
+
+  const orderData = {
+    website: websiteData.title,
+    price: websiteData.price,
+    image: websiteData.image,
+    description: websiteData.description,
+    firstName: document.getElementById("firstName").value,
+    lastName: document.getElementById("lastName").value,
+    email: document.getElementById("email").value,
+    country: document.getElementById("country").value,
+    phone: document.getElementById("phone").value,
+    city: document.getElementById("city").value,
+    domain: domainValue,
+    timestamp: Date.now()
+  };
+
+  push(ref(db, "payments"), orderData)
+    .then(() => {
+      status.textContent = "Payment info sent successfully!";
+      form.reset();
+      domainButtons.forEach(b => b.classList.remove("active"));
+      selectedDomain = "";
+    })
+    .catch(err => {
+      console.error(err);
+      status.textContent = "Error sending payment info. Try again.";
+    });
+}
+
+// Submit form when clicking Send Info button
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  submitOrder();
+});
+
+// Pay button action (optional)
+document.getElementById("payBtn").addEventListener("click", () => {
+  submitOrder();
+  // Optionally, redirect to a real payment gateway here
+  // window.location.href = "https://yourpaymentgateway.com/?amount=" + websiteData.price;
+});
+</script>
+<!-- BEGIN INFO CARDS SECTION -->
+<style>
+.payment-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.payment-cards .card {
+  background: #111827;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.payment-cards .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.7);
+}
+
+.payment-cards .card h3 {
+  margin-top: 0;
+  font-size: 18px;
+  color: #22c55e;
+}
+
+.payment-cards .card p {
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.4;
+}
+
+.payment-cards .card .buy-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 15px;
+  background: #22c55e;
+  color: #000;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+}
+</style>
+
+<div class="payment-cards" id="infoCards"></div>
+
+<script type="module">
+// Replace this with your Firebase config if you want "Buy Now" buttons to submit
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAD0QJvrnC0zxnGnbfVg3Y74Tffy6rxjmU",
+  authDomain: "markmellon-world.firebaseapp.com",
+  databaseURL: "https://markmellon-world-default-rtdb.firebaseio.com",
+  projectId: "markmellon-world",
+  storageBucket: "markmellon-world.firebasestorage.app",
+  messagingSenderId: "414939524675",
+  appId: "1:414939524675:web:c98e0f4d301d933d1d6ef6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Cards content
+const cards = [
+  {
+    title: "Purchase Steps",
+    description: "1. Fill your information above.<br>2. Choose domain and preferences.<br>3. Confirm payment securely.",
+  },
+  {
+    title: "Violation Guidelines",
+    description: "Make sure your website content complies with laws and regulations. Avoid prohibited content to prevent issues.And prohibited content like nudity content or scamimg content could lead to website ban and more charges",
+  },
+  {
+    title: "Website Guidelines",
+    description: "All websites come ready-to-use. You can customize content, images, and layout after purchase.",
+  }
+];
+
+// Render cards
+const container = document.getElementById("infoCards");
+cards.forEach(card => {
+  const div = document.createElement("div");
+  div.className = "card";
+  div.innerHTML = `
+    <h3>${card.title}</h3>
+    <p>${card.description}</p>
+  `;
+  container.appendChild(div);
+});
+
+// Optional: Add Buy Now button functionality
+/*
+document.querySelectorAll('.buy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Push data to Firebase payments node
+    const data = {
+      website: "Example Website",
+      timestamp: Date.now(),
+      note: "Purchased via card"
+    };
+    push(ref(db, "payments"), data)
+      .then(() => alert("Payment info submitted!"))
+      .catch(err => console.error(err));
+  });
+});
+*/
+</script>
+<!-- END INFO CARDS SECTION -->
+</body>
+</html>

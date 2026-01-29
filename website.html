@@ -1,0 +1,276 @@
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ready-Built Website Store</title>
+<style>
+:root {
+  --bg: #0f1419;
+  --card-bg: #fff;
+  --accent: #2f81f7;
+  --shadow: rgba(0,0,0,0.2);
+}
+body {
+  margin:0; font-family: Arial, sans-serif; background: var(--bg);
+}
+header {
+  text-align:center; padding:20px; background: var(--accent); color:#fff;
+}
+header h1 { margin:0; font-size:22px; }
+header p { margin-top:5px; font-size:13px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; padding:15px; }
+.card {
+  background: var(--card-bg); border-radius:10px; padding:15px; text-align:center;
+  cursor:pointer; box-shadow:0 3px 10px var(--shadow); transition: 0.3s;
+  position: relative;
+}
+.card:hover { transform: translateY(-3px); box-shadow:0 5px 15px var(--shadow); }
+.card img { width:100%; border-radius:8px; margin-bottom:8px; height:120px; object-fit:cover; }
+.card h3 { margin:8px 0; font-size:14px; }
+
+.modal-bg {
+  position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);
+  display:none; justify-content:center; align-items:center; z-index:1000;
+}
+.modal {
+  background: var(--card-bg); padding:15px; border-radius:10px; max-width:700px; width:85%;
+  max-height:85%; overflow-y:auto; position:relative;
+}
+.modal h2 { margin-top:0; text-align:center; font-size:18px; }
+.close { position:absolute; top:8px; right:12px; font-size:22px; cursor:pointer; }
+
+.template-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-top:15px; }
+.template-card { background:#f0f0f0; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.15); position: relative; }
+.template-card img { width:100%; display:block; height:120px; object-fit:cover; }
+.template-card .discount-badge { position:absolute; top:8px; right:8px; background:red; color:#fff; padding:3px 6px; font-size:11px; border-radius:5px; font-weight:bold; }
+.template-card .content { padding:8px; text-align:center; }
+.template-card .content h4 { margin:4px 0; font-size:14px; }
+.template-card .content p.price { margin:4px 0; font-weight:bold; color:#2f81f7; font-size:13px; }
+.template-card .content p.desc { font-size:12px; color:#555; margin:4px 0; }
+.template-card .content button { margin:4px 4px 0 4px; padding:5px 8px; border:none; border-radius:5px; cursor:pointer; font-weight:600; font-size:12px; }
+.template-card .content button.buy { background:#2f81f7; color:#fff; }
+.template-card .content button.view { background:#fff; border:1px solid #2f81f7; color:#2f81f7; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ready-Built Website Store</h1>
+  <p>Select a category to explore templates</p>
+</header> 
+
+<div class="grid" id="categoryGrid">
+  <div class="card" data-category="personal">
+    <img src="https://i.ibb.co/svcVpxtC/cd53232fa34785dcb7a589683332d95d.webp" alt="Personal Website">
+    <h3>Personal Websites</h3>
+  </div>
+  <div class="card" data-category="marketing">
+    <img src="https://i.ibb.co/svcVpxtC/cd53232fa34785dcb7a589683332d95d.webp" alt="Marketing Website">
+    <h3>Marketing Websites</h3>
+  </div>
+  <div class="card" data-category="industry">
+    <img src="https://i.ibb.co/LDrCmZR7/7c34582bc3155a6fbb4620a6b2df92ee.webp" alt="Industry Website">
+    <h3>Industry Websites</h3>
+  </div>
+  <div class="card" data-category="business">
+    <img src="https://i.ibb.co/LDrCmZR7/7c34582bc3155a6fbb4620a6b2df92ee.webp" alt="Business Website">
+    <h3>Business Websites</h3>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2 id="modalTitle">Templates</h2>
+    <div class="template-grid" id="templateGrid">
+      <!-- Templates loaded dynamically -->
+    </div>
+  </div>
+</div>
+<!-- Firebase SDKs (must load BEFORE your script) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<!-- Your merged script -->
+<script>
+(function() {
+  // Your merged Firebase + templates + gallery code goes here
+})();
+</script>
+<script>
+(function() {
+  /* =======================
+     SAFE FIREBASE INIT
+  ======================== */
+  const firebaseConfig = {
+    apiKey: "AIzaSyAD0QJvrnC0zxnGnbfVg3Y74Tffy6rxjmU",
+    authDomain: "markmellon-world.firebaseapp.com",
+    projectId: "markmellon-world",
+    storageBucket: "markmellon-world.firebasestorage.app",
+    messagingSenderId: "414939524675",
+    appId: "1:414939524675:web:c98e0f4d301d933d1d6ef6",
+    databaseURL: "https://markmellon-world-default-rtdb.firebaseio.com"
+  };
+
+  const firebaseApp = !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
+  const db = firebaseApp.database();
+
+  /* =======================
+     ELEMENTS
+  ======================== */
+  const eliteLarge = document.getElementById("elite-large");
+  const eliteSmall = document.getElementById("elite-small");
+  const galleryModal = document.getElementById("galleryModal");
+  const modalImages = document.getElementById("modalImages");
+  const viewGalleryBtn = document.getElementById("viewGalleryBtn");
+  const closeGalleryBtn = document.getElementById("closeModal");
+
+  const templateGrid = document.getElementById("templateGrid");
+  const modalBg = document.getElementById("modalBg");
+  const modalTitle = document.getElementById("modalTitle");
+
+  /* =======================
+     LOAD WALLPAPERS
+  ======================== */
+  if (eliteLarge && eliteSmall) {
+    db.ref('wallpapers').once('value').then(snapshot => {
+      const wallpapers = snapshot.val();
+      if (!wallpapers) return;
+      const urls = Object.values(wallpapers);
+      if (urls.length > 0) {
+        const firstImg = document.createElement('img');
+        firstImg.src = urls[0];
+        firstImg.alt = "Wallpaper";
+        firstImg.style = "width:100%;height:100%;object-fit:cover;border-radius:14px;cursor:pointer;";
+        eliteLarge.appendChild(firstImg);
+
+        for (let i = 1; i < urls.length; i++) {
+          const img = document.createElement('img');
+          img.src = urls[i];
+          img.alt = "Wallpaper";
+          img.style = "width:100%;height:100%;object-fit:cover;border-radius:14px;cursor:pointer;";
+          eliteSmall.appendChild(img);
+        }
+      }
+    }).catch(console.error);
+  }
+
+  /* =======================
+     GALLERY MODAL
+  ======================== */
+  viewGalleryBtn?.addEventListener("click", e => {
+    e.preventDefault();
+    if (!galleryModal || !modalImages) return;
+
+    galleryModal.style.display = "block";
+    modalImages.innerHTML = "<p style='color:#fff;text-align:center;'>Loading...</p>";
+
+    db.ref('morewallpapers').once('value').then(snapshot => {
+      modalImages.innerHTML = "";
+      const wallpapers = snapshot.val();
+      if (!wallpapers) {
+        modalImages.innerHTML = "<p style='color:#fff;text-align:center;'>No images found</p>";
+        return;
+      }
+      Object.values(wallpapers).forEach(url => {
+        const img = document.createElement("img");
+        img.src = url;
+        img.style = "width:100%;height:200px;object-fit:cover;border-radius:12px;cursor:pointer;margin-bottom:10px;";
+
+        img.addEventListener("click", () => {
+          const viewer = document.createElement("div");
+          viewer.style = `
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.9);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            z-index:10000;
+          `;
+          viewer.innerHTML = `<img src="${url}" style="max-width:90%;max-height:90%;border-radius:12px;">`;
+          viewer.onclick = () => viewer.remove();
+          document.body.appendChild(viewer);
+        });
+        modalImages.appendChild(img);
+      });
+    }).catch(console.error);
+  });
+
+  closeGalleryBtn?.addEventListener("click", () => {
+    galleryModal.style.display = "none";
+  });
+
+  /* =======================
+     LOAD WEBSITE TEMPLATES
+  ======================== */
+  function loadTemplates(category) {
+    if (!templateGrid) return;
+
+    templateGrid.innerHTML = "<p class='loading'>Loading templates...</p>";
+
+    db.ref(`websites/${category}`).once('value').then(snapshot => {
+      const data = snapshot.val();
+      templateGrid.innerHTML = "";
+
+      if (!data) {
+        templateGrid.innerHTML = "<p style='text-align:center;color:#fff;'>No templates available</p>";
+        return;
+      }
+
+      Object.entries(data).forEach(([key, t]) => {
+        const card = document.createElement("div");
+        card.className = "template-card";
+
+        card.innerHTML = `
+          <img src="${t.img || ''}" alt="${t.title || ''}">
+          ${t.discount ? `<span class="discount-badge">${t.discount}</span>` : ""}
+          <div class="content">
+            <h4>${t.title || 'Untitled'}</h4>
+            <p class="price">${t.price || ''}</p>
+            <p class="desc">${t.desc || ''}</p>
+            <div class="actions">
+              <button class="buy">Buy</button>
+              <button class="view">View</button>
+            </div>
+          </div>
+        `;
+
+        card.querySelector(".buy").onclick = () => {
+          const paymentUrl = `payment.html?title=${encodeURIComponent(t.title)}&price=${encodeURIComponent(t.price)}`;
+          window.location.href = paymentUrl;
+        };
+        card.querySelector(".view").onclick = () => window.open(t.url, "_blank");
+
+        templateGrid.appendChild(card);
+      });
+    }).catch(err => {
+      console.error(err);
+      templateGrid.innerHTML = "<p style='text-align:center;color:#fff;'>Error loading templates</p>";
+    });
+  }
+
+  /* =======================
+     CATEGORY CARD CLICK
+  ======================== */
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".card").forEach(card => {
+      card.addEventListener("click", () => {
+        const category = card.dataset.category;
+        modalTitle.innerText = card.querySelector("h3")?.innerText || "Templates";
+        loadTemplates(category);
+        modalBg.style.display = "flex";
+      });
+    });
+  });
+
+  /* =======================
+     CLOSE MODAL FUNCTION
+  ======================== */
+  window.closeModal = () => {
+    if (modalBg) modalBg.style.display = "none";
+  };
+})();
+</script>
+
+
+</body>
+</html>

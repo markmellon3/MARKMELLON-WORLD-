@@ -497,7 +497,8 @@
     <div>
       <h2>WELCOME TO PLACE OF WONDERS </h2>
       <p>
-       
+        Browse high-quality wallpapers curated for creators, gamers,
+        and minimal lovers. Fresh uploads added daily.
       </p>
       <a href="#search" class="hero-btn">Explore Collection</a>
     </div>
@@ -505,6 +506,123 @@
 </section>
   <input type="text" id="search-input" class="search-bar" placeholder="Search websites (name or description)..." />
   
+  <h1>Ready-Built Website Store</h1>
+  <p>Choose a category and preview the template instantly</p>
+
+<div class="grid" id="categoryGrid">
+  <div class="card" data-url="https://markmellon3.github.io/MARKMELLON-WORLD-/homepage.html">
+    <img src="https://i.ibb.co/svcVpxtC/cd53232fa34785dcb7a589683332d95d.webp" alt="Personal Website">
+    <h3>Personal Websites</h3>
+  </div>
+  <div class="card" data-url="https://example.com/marketing">
+    <img src="https://i.ibb.co/svcVpxtC/cd53232fa34785dcb7a589683332d95d.webp" alt="Marketing Website">
+    <h3>Marketing Websites</h3>
+  </div>
+  <div class="card" data-url="https://example.com/industry">
+    <img src="https://i.ibb.co/LDrCmZR7/7c34582bc3155a6fbb4620a6b2df92ee.webp" alt="Industry Website">
+    <h3>Industry Websites</h3>
+  </div>
+  <div class="card" data-url="https://example.com/business">
+    <img src="https://i.ibb.co/LDrCmZR7/7c34582bc3155a6fbb4620a6b2df92ee.webp" alt="Business Website">
+    <h3>Business Websites</h3>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <span class="close" id="modalClose">&times;</span>
+    <iframe id="modalIframe" src="" frameborder="0"></iframe>
+  </div>
+</div>
+
+<script>
+(() => {
+  const cards = document.querySelectorAll('.card');
+  const modalBg = document.getElementById('modalBg');
+  const modalIframe = document.getElementById('modalIframe');
+  const modalClose = document.getElementById('modalClose');
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const url = card.dataset.url; // safer way to get data-url
+      if (!url) return;
+
+      // For local files, use relative path
+      modalIframe.src = url;
+      modalBg.classList.add('show');
+    });
+  });
+
+  const closeModal = () => {
+    modalBg.classList.remove('show');
+    // Clear iframe after animation ends
+    setTimeout(() => modalIframe.src = '', 300);
+  };
+
+  // Close modal when clicking X
+  modalClose.addEventListener('click', closeModal);
+
+  // Close modal when clicking outside the modal box
+  modalBg.addEventListener('click', e => {
+    if (e.target === modalBg) closeModal();
+  });
+})();
+</script>
+
+<style>
+:root {
+  --bg: #0f1419;
+  --card-bg: #17202a;
+  --header-bg: #0f1419;
+  --shadow: rgba(0,0,0,0.2);
+}
+body {
+  margin:0; font-family: Arial, sans-serif; background: var(--bg); color:#fff;
+}
+
+
+header h1 { 
+  margin:0; font-size:26px; letter-spacing:1px; font-weight:700;
+  text-transform: uppercase; 
+}
+header p { 
+  margin-top:8px; font-size:15px; color:#ccc; 
+}
+
+/* Grid & cards */
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; padding:15px; }
+.card {
+  background: var(--card-bg); border-radius:10px; padding:15px; text-align:center;
+  cursor:pointer; box-shadow:0 3px 10px var(--shadow); transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+.card:hover { transform: translateY(-4px) scale(1.03); box-shadow:0 8px 20px var(--shadow); }
+.card img { width:100%; border-radius:8px; margin-bottom:8px; height:120px; object-fit:cover; }
+.card h3 { margin:8px 0; font-size:14px; }
+
+/* Modal styling */
+.modal-bg {
+  position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6);
+  display:flex; justify-content:center; align-items:center; z-index:1000;
+  opacity:0; pointer-events:none; transition: opacity 0.3s ease;
+}
+.modal-bg.show {
+  opacity:1; pointer-events:auto;
+}
+.modal {
+  background: var(--card-bg); padding:15px; border-radius:10px; max-width:800px; width:85%;
+  max-height:85%; overflow:hidden; position:relative;
+  transform: scale(0.8); transition: transform 0.3s ease;
+}
+.modal-bg.show .modal {
+  transform: scale(1);
+}
+.modal iframe {
+  width:100%; height:70vh; border-radius:8px; border:none;
+}
+.close { position:absolute; top:8px; right:12px; font-size:24px; cursor:pointer; color:#fff; }
+</style>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
@@ -881,5 +999,6 @@ onValue(heroRef, snapshot => {
     closeModal.onclick = () => modal.style.display = "none";
     modal.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
   </script>
+  
 </body>
 </html>

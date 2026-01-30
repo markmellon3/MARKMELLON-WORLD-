@@ -497,8 +497,7 @@
     <div>
       <h2>WELCOME TO PLACE OF WONDERS </h2>
       <p>
-        Welcome! Explore, discover, and enjoy your journey here.Every great journey begins with a single click. 
-        Here is Where ideas come to life. Start here. Go anywhere.
+        Welcome! Explore, discover, and enjoy your journey here.Every great journey begins with a single click. Here is Where ideas come to life. Start here. Go anywhere.
       </p>
       <a href="#search" class="hero-btn">Explore Collection</a>
     </div>
@@ -674,7 +673,7 @@ onValue(heroRef, snapshot => {
 <section class="elite-section">
   <div class="elite-header">
     <div>
-      <span "elite-tag">wallpapers</span>
+    
       <h2>4k Wallpapers</h2>
     </div>
     <a href="#" class="view-gallery" id="viewGalleryBtn">View Full Gallery →</a>
@@ -1063,5 +1062,204 @@ onValue(maintenanceRef, snap => {
   }
 });
 </script>
+<!-- ================= PAGE HEADING ================= -->
+<h1 class="page-title">Post Your Images to Google</h1>
+<p>upload your images to Google images search</p>
+
+<!-- ================= MAIN CARD ================= -->
+
+<div class="card" id="mainCard">
+
+  <!-- ===== IMAGE SECTION ===== -->
+  <div class="section">
+    <h3 class="section-title">Example Images</h3>
+
+    <div class="card-images">
+      <div class="img-frame">
+        <img src="https://i.ibb.co/LhhFgDhH/images-1.webp">
+      </div>
+      <div class="img-frame">
+        <img src="https://i.ibb.co/jZZpRTM7/Screenshot-20260130-031608-Chrome-1.webp">
+      </div>
+      <div class="img-frame">
+        <img src="https://i.ibb.co/VWQsmcpN/Screenshot-20260130-031509-Chrome.webp">
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DIVIDER ===== -->
+  <div class="divider"></div>
+
+  <!-- ===== POLICY SECTION ===== -->
+  <div class="section">
+    <h3 class="section-title">Policies & Guidelines</h3>
+
+    <div class="policy-cards">
+      <div class="policy-card">
+        <h4>Violation Policy</h4>
+        <p>No nudity or explicit content.Google does not allow images that contain:
+Sexual content involving minors
+Extreme violence or gore
+Terrorism-related imagery
+Hate symbols or content promoting violence or discrimination
+Illegal activities or instructions()</p>
+      </div>
+
+      <div class="policy-card">
+        <h4>Privacy Policy</h4>
+        <p>Only upload images you own or have permission to use.4. Privacy & Personal Data Violations
+Images exposing personal or sensitive information are prohibited, including:
+Government IDs, passports, credit cards
+Medical records
+Private individuals in non-public settings without consent
+Publishing images of people without permission may violate privacy laws.</p>
+      </div>
+
+      <div class="policy-card">
+        <h4>Google Policy</h4>
+        <p>No copyrighted, violent, hateful, or illegal content.Images displayed in Google Images are indexed from websites across the internet. Use of these images is subject to copyright laws and Google’s content policies. The following actions may result in violations, content removal, or legal consequences.Google may remove images that violate its policies.
+Copyright owners may submit DMCA takedown requests.
+Repeated violations can result in account suspension or legal action.</p>
+      </div>
+    </div>
+  </div>
+
+    <!-- Navigation button -->
+    <a href="googleimage.html" class="navigate-btn">ADD TO GOOGLE </a>
+  </div>
+</div>
+<style>
+:root {
+  --bg: #0f1419;
+  --card-bg: #17202a;
+  --shadow: rgba(0,0,0,0.25);
+  --accent: #22c55e;
+}
+
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color:#fff;
+  text-align:center;
+}
+.page-title{
+  margin:30px 25px;
+  font-size:28px;
+  text-align:left;      /* moves text to the side */
+}
+/* ===== SECTIONS ===== */
+.section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #f1f5f9;
+  text-align: center;
+}
+
+/* Divider between images and policies */
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #334155, transparent);
+  margin: 30px 0;
+}
+
+/* ================= GRID & CARD ================= */
+.card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow:0 10px 40px rgba(0,0,0,.5);
+}
+
+/* ================= CARD IMAGES ================= */
+.card-images {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.img-frame {
+  background: #1f2937;
+  padding: 8px;
+  border-radius: 12px;
+  flex: 1 1 100px;
+  max-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.img-frame img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* ================= POLICY CARDS ================= */
+.policy-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.policy-card {
+  background: #0b0f14;
+  padding: 15px 20px;
+  border-radius: 14px;
+  flex: 1 1 150px;
+  max-width: 220px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: transform .25s, box-shadow .25s;
+  text-align: left;
+}
+
+.policy-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,.4);
+}
+
+.policy-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+}
+
+.policy-card p {
+  margin: 0;
+  font-size: 13px;
+  color:#ccc;
+}
+
+/* ================= NAVIGATION BUTTON ================= */
+.navigate-btn {
+  display: inline-block;
+  padding: 14px 30px;
+  background: var(--accent);
+  color:#fff;
+  font-weight: bold;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: background .3s;
+}
+
+.navigate-btn:hover {
+  background: #16a34a;
+}
+
+/* Responsive */
+@media(max-width:600px){
+  .card-images { flex-direction: column; gap: 12px; }
+  .img-frame { max-width:100%; }
+  .policy-cards { flex-direction: column; }
+  .policy-card { max-width:100%; text-align:center; }
+}
+</style>
 </body>
 </html>

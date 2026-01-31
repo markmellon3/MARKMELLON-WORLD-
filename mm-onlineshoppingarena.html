@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PLACE OF WONDERS-SHOP-MM-SHOPPINGARENA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" sizes="96x96" />
+<link rel="icon" type="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" href="/favicon.svg" />
+<link rel="shortcut icon" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" />
+<link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" />
+<meta name="apple-mobile-web-app-title" content="MyWebSite" />
+<link rel="manifest" href="/site.webmanifest" />
+<style>
+body{
+  margin:0;
+  background:#0f172a;
+  font-family:Arial, sans-serif;
+  color:#fff;
+}
+h1,h2,h3{
+  padding:10px 20px;
+  margin:0;
+}
+.section{
+  padding:10px 20px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(150px,1fr));
+  gap:10px;
+}
+.card{
+  background:#1e293b;
+  border-radius:10px;
+  overflow:hidden;
+}
+.card.flash{
+  background:#7c2d12;
+}
+.card img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+}
+.card-body{
+  padding:6px;
+}
+.card-body h4{
+  font-size:13px;
+  margin:4px 0;
+}
+.price{
+  font-size:12px;
+}
+.phone{
+  font-size:11px;
+  opacity:.8;
+}
+button{
+  width:100%;
+  margin-top:6px;
+  padding:6px;
+  border:none;
+  border-radius:6px;
+  background:#22c55e;
+  font-weight:bold;
+  font-size:12px;
+  cursor:pointer;
+}
+hr{
+  border:0;
+  height:1px;
+  background:#334155;
+  margin:10px 0;
+}
+input::placeholder {
+  color: #94a3b8;
+  font-size: 12px;
+}
+</style>
+<style>
+/* ===== SEARCH BAR ===== */
+#searchInput {
+  width: 100%;
+  padding: 12px 16px; /* comfortable padding */
+  margin-bottom: 20px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid #475569; /* subtle border */
+  background-color: #1e293b; /* dark input background */
+  color: #f1f5f9; /* text color */
+  outline: none;
+  transition: 0.3s ease;
+}
+
+/* Placeholder styling */
+#searchInput::placeholder {
+  color: #94a3b8; /* muted text */
+}
+
+/* Focus effect */
+#searchInput:focus {
+  border-color: #22c55e; /* green accent */
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5); /* soft glow */
+}
+
+/* Optional: add a small magnifying icon inside input */
+#searchInput {
+  background: url('https://cdn-icons-png.flaticon.com/512/622/622669.png') no-repeat 12px center;
+  background-size: 20px 20px;
+  padding-left: 42px; /* space for icon */
+}
+
+/* Smooth appearance for search results grid */
+#searchResults {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+</style>
+
+</head>
+
+<body>
+<h1>🛒 MW-SHOPPING -ARENA 🛍️</h1>
+<hr>
+<h2>🔍 Search Products</h2>
+<input type="text" id="searchInput" placeholder="Search for products..." style="width:95%;padding:10px;margin-bottom:10px;font-size:17px;">
+
+<div id="searchResults" class="grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+/* ======================
+   Firebase Configs
+====================== */
+const firebaseConfigs = [
+  {
+    config: {
+      apiKey: "AIzaSyBSvsfXPXdwN-rh2KWvV7urUl_aEuqdOuE",
+      authDomain: "jordanshop-5f754.firebaseapp.com",
+      databaseURL: "https://jordanshop-5f754-default-rtdb.firebaseio.com",
+      projectId: "jordanshop-5f754",
+      storageBucket: "jordanshop-5f754.firebasestorage.app",
+      messagingSenderId: "99289233170",
+      appId: "1:99289233170:web:5b67672a133d7ff677a5cb"
+    },
+    name: "SHOP_APP"
+  },
+  {
+    config: {
+      apiKey: "AIzaSyCI1yBIgDhl7cnKjCzOaWt4vK2Q-DcQrac",
+      authDomain: "essie-db2aa.firebaseapp.com",
+      databaseURL: "https://essie-db2aa-default-rtdb.firebaseio.com",
+      projectId: "essie-db2aa",
+      storageBucket: "essie-db2aa.appspot.com",
+      messagingSenderId: "210132046846",
+      appId: "1:210132046846:web:5fac8fedce997553cda6af"
+    },
+    name: "ADS_APP"
+  }
+  // add more Firebase configs here if needed
+];
+
+/* ======================
+   Initialize Apps & Databases
+====================== */
+const dbApps = firebaseConfigs.map(fb => getDatabase(initializeApp(fb.config, fb.name)));
+
+/* ======================
+   Global Products Array
+====================== */
+let allProducts = [];
+
+/* ======================
+   Load Products from DB
+====================== */
+function loadProducts(db) {
+  return new Promise(resolve => {
+    onValue(ref(db, "catalogs"), snapshot => {
+      if (snapshot.exists()) {
+        snapshot.forEach(categorySnap => {
+          categorySnap.forEach(itemSnap => {
+            const p = itemSnap.val();
+            if (!p) return;
+
+            allProducts.push({
+              name: p.name || "",
+              price: p.price || 0,
+              phone: p.phone || "",
+              image: p.image || "",
+              category: categorySnap.key || ""
+            });
+          });
+        });
+      }
+      resolve();
+    });
+  });
+}
+
+/* ======================
+   Render Products Function
+====================== */
+const searchResults = document.getElementById("searchResults");
+
+function renderProducts(products) {
+  searchResults.innerHTML = "";
+  if (products.length === 0) {
+    searchResults.innerHTML = "<p>No products found</p>";
+    return;
+  }
+
+  products.forEach(p => {
+    searchResults.insertAdjacentHTML("beforeend", `
+      <div class="card" style="background:#1e293b;border-radius:10px;overflow:hidden;">
+        <img src="${p.image}" style="width:100%;height:120px;object-fit:cover;">
+        <div class="card-body" style="padding:6px;">
+          <h4 style="font-size:14px;margin:4px 0;">${p.name}</h4>
+          <div class="price" style="font-size:13px;">UGX ${Number(p.price).toLocaleString()}</div>
+          <div style="font-size:11px;color:#aaa;">Category: ${p.category}</div>
+          
+          <!-- Phone / Call button -->
+          ${p.phone ? `
+          <div class="phone">📞 ${p.phone}</div>
+          
+           <!-- Quantity selector -->
+           <input type="number"
+  id="qty-${p.name.replace(/\s/g,'')}"
+  placeholder="Quantity"
+  value=""
+  min="1"
+  style="
+    width:95%;
+    margin-top:6px;
+    padding:4px;
+    border-radius:6px;
+    border:1px solid #ccc;
+    font-size:12px;
+  "
+/>       
+          <button style="margin-top:4px;width:100%;background:#22c55e;color:#fff;border:none;padding:6px;border-radius:6px;cursor:pointer;font-size:12px;"
+            onclick="location.href='tel:${p.phone}'">CALL</button>
+
+          <!-- WhatsApp Button -->
+          <button style="
+            margin-top:4px;
+            width:100%;
+            background:#25D366;
+            color:#fff;
+            border:none;
+            padding:6px;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:12px;
+          "
+          onclick="
+            (function() {
+              const phone = '${p.phone}'.replace(/\\D/g,''); // remove non-digit chars
+              const quantityInput = document.getElementById('qty-${p.name.replace(/\s/g,'')}');
+              const quantity = quantityInput ? quantityInput.value || 1 : 1;
+
+              const message = encodeURIComponent(
+                '🤝 *YOUR MOST WELCOME THANK YOU FOR CHOOSING SHOPPING ARENA*\\n\\n' +
+                '🛍️ *Product Purchase Inquiry*\\n' +
+                '📌 Order Details*\\n' +
+                '🛒 Product: ${p.name}\\n' +
+                '💰 Price: UGX ${Number(p.price).toLocaleString()}\\n' +
+                '📂 Category: ${p.category}\\n' +
+                '🔢 Quantity: ' + quantity + '\\n' +
+                '🖼 Image: ${p.image}\\n' +
+                '🌐 Website: ' + location.origin
+              );
+
+              window.open('https://wa.me/' + phone + '?text=' + message, '_blank');
+            })()
+          ">
+            📦 WhatsApp
+          </button>
+
+          <!-- Share Button -->
+<button style="margin-top:4px;width:100%;background:#3b82f6;color:#fff;border:none;padding:6px;border-radius:6px;cursor:pointer;font-size:12px;"
+  onclick="shareProduct('${encodeURIComponent(p.name)}','${encodeURIComponent(p.price)}','${encodeURIComponent(p.image)}')">
+  🔗 Share
+</button>
+          ` : ""}
+        </div>
+      </div>
+    `);
+  });
+}
+
+/* ======================
+   Load All Products from All DBs
+====================== */
+Promise.all(dbApps.map(db => loadProducts(db))).then(() => {
+  renderProducts(allProducts); // render all products by default
+});
+
+/* ======================
+   Search Filter
+====================== */
+const searchInput = document.getElementById("searchInput");
+
+searchInput.addEventListener("input", e => {
+  const query = e.target.value.toLowerCase();
+  const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query));
+  renderProducts(filtered);
+});
+</script>
+<script>
+function shareProduct(name, price, image) {
+  name = decodeURIComponent(name);
+  price = decodeURIComponent(price);
+  image = decodeURIComponent(image);
+
+  // === Dynamic SEO Meta Tags ===
+  function setMeta(nameAttr, content, property=false){
+    let tag;
+    if(property){
+      tag = document.querySelector(`meta[property='${nameAttr}']`);
+    } else {
+      tag = document.querySelector(`meta[name='${nameAttr}']`);
+    }
+    if(!tag){
+      tag = document.createElement('meta');
+      if(property){ tag.setAttribute('property', nameAttr); }
+      else{ tag.setAttribute('name', nameAttr); }
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute('content', content);
+  }
+
+  // Set Open Graph tags
+  setMeta('og:title', name, true);
+  setMeta('og:description', `UGX ${Number(price).toLocaleString()} — ${name}`, true);
+  setMeta('og:image', image, true);
+  setMeta('og:url', location.origin + location.pathname + '?product=' + encodeURIComponent(name), true);
+
+  // === Share Data ===
+  const shareData = {
+    title: name,
+    text: `UGX ${Number(price).toLocaleString()} — ${name}`,
+    url: location.origin + location.pathname + '?product=' + encodeURIComponent(name)
+  };
+
+  if(navigator.share){
+    navigator.share(shareData);
+  } else {
+    navigator.clipboard.writeText(shareData.url);
+    alert('Product link copied! (SEO tags set for preview)');
+  }
+}
+</script>
+</body>
+</html>

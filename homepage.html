@@ -473,6 +473,31 @@
     padding: 1.8rem;
   }
 }
+    <!-- CSS for styling -->
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center; /* center buttons horizontally */
+  margin: 20px 0;
+}
+
+.nav-btn {
+  background-color: #facc15; /* yellow/gold button */
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000; /* dark text */
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.nav-btn:hover {
+  background-color: #eab308; /* darker yellow on hover */
+  transform: scale(1.05);
+}
   </style>
 </head>
 <body>
@@ -502,9 +527,14 @@
       <a href="#search" class="hero-btn">Explore Collection</a>
     </div>
   </div>
-</section>
-  <input type="text" id="search-input" class="search-bar" placeholder="Search websites (name or description)..." />
-  
+    </section>
+  <!-- Navigation Buttons -->
+<div class="nav-buttons">
+  <button class="nav-btn" onclick="location.href='mm-onlineshoppingarena.html'">🛒SHOP ARENA </button>
+  <button class="nav-btn" onclick="location.href='megra-arena.html'">MEGRA ARENA </button>
+  <button class="nav-btn" onclick="location.href='lookup.html'">BUY REQUEST </button>
+  <button class="nav-btn" onclick="location.href='sell.html'">SELL</button>
+</div>
   <h1>Ready-Built Website Store</h1>
 <p>Choose a category and preview the template instantly</p>
 

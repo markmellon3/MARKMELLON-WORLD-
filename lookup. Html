@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PLACE OF WONDERS-SHOP-MM-SHOPPINGARENA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" sizes="96x96" />
+<link rel="shortcut icon" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" />
+<link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" />
+
+<style>
+body{
+  margin:0;
+  background:#0f172a;
+  font-family:Arial, sans-serif;
+  color:#fff;
+}
+h1,h2,h3{
+  padding:10px 20px;
+  margin:0;
+}
+.section{
+  padding:10px 20px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(150px,1fr));
+  gap:10px;
+}
+.card{
+  background:#1e293b;
+  border-radius:10px;
+  overflow:hidden;
+}
+.card img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+}
+.card-body{
+  padding:6px;
+}
+.card-body h4{
+  font-size:13px;
+  margin:4px 0;
+}
+.price, .phone{
+  font-size:12px;
+}
+.phone{
+  font-size:11px;
+  opacity:.8;
+}
+button{
+  width:100%;
+  margin-top:6px;
+  padding:6px;
+  border:none;
+  border-radius:6px;
+  background:#22c55e;
+  font-weight:bold;
+  font-size:12px;
+  cursor:pointer;
+}
+hr{
+  border:0;
+  height:1px;
+  background:#334155;
+  margin:10px 0;
+}
+input, select{
+  width:100%;
+  padding:6px;
+  margin:4px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+  font-size:12px;
+  box-sizing:border-box;
+}
+input::placeholder {
+  color: #94a3b8;
+  font-size: 12px;
+}
+.form-container{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+  margin:10px 20px;
+}
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PLACE OF WONDERS-SHOP-MM-SHOPPINGARENA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" sizes="96x96" />
+<link rel="shortcut icon" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" />
+<link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" />
+
+<style>
+body{
+  margin:0;
+  background:#0f172a;
+  font-family:Arial, sans-serif;
+  color:#fff;
+}
+h1,h2,h3{
+  padding:10px 20px;
+  margin:0;
+}
+.section{
+  padding:10px 20px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(180px,1fr));
+  gap:10px;
+}
+.card{
+  background:#1e293b;
+  border-radius:10px;
+  overflow:hidden;
+}
+.card img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+}
+.card-body{
+  padding:6px;
+}
+.card-body h4{
+  font-size:13px;
+  margin:4px 0;
+}
+.card-body p{
+  font-size:12px;
+  margin:2px 0;
+}
+button{
+  width:100%;
+  margin-top:6px;
+  padding:6px;
+  border:none;
+  border-radius:6px;
+  background:#22c55e;
+  font-weight:bold;
+  font-size:12px;
+  cursor:pointer;
+}
+.logout-btn{
+  background:#ef4444;
+  margin-bottom:10px;
+}
+input, select, textarea{
+  width:100%;
+  padding:6px;
+  margin:4px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+  font-size:12px;
+  box-sizing:border-box;
+}
+input::placeholder, textarea::placeholder {
+  color: #94a3b8;
+  font-size: 12px;
+}
+.form-container{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+  margin:10px 20px;
+}
+.hidden{
+  display:none;
+}
+</style>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import {
+  getDatabase,
+  ref,
+  push,
+  onValue
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+/* =========================
+   FIREBASE CONFIGS
+========================= */
+
+/* 🔐 AUTH PROJECT */
+const authConfig = {
+  apiKey: "AIzaSyAD0QJvrnC0zxnGnbfVg3Y74Tffy6rxjmU",
+  authDomain: "markmellon-world.firebaseapp.com",
+  projectId: "markmellon-world",
+  storageBucket: "markmellon-world.firebasestorage.app",
+  messagingSenderId: "414939524675",
+  appId: "1:414939524675:web:c98e0f4d301d933d1d6ef6",
+  databaseURL: "https://markmellon-world-default-rtdb.firebaseio.com"
+};
+
+/* 💬 MESSAGE PROJECT */
+const messageConfig = {
+  apiKey: "AIzaSyCM56EOZJmclhOfWbqCRJ1ee-vF7vTuZ8c",
+  authDomain: "mw-messages.firebaseapp.com",
+  projectId: "mw-messages",
+  storageBucket: "mw-messages.firebasestorage.app",
+  messagingSenderId: "443070993730",
+  appId: "1:443070993730:web:d7a68aab3acee8b2e1e4db",
+  databaseURL: "https://mw-messages-default-rtdb.firebaseio.com"
+};
+
+/* =========================
+   INIT APPS
+========================= */
+const authApp = initializeApp(authConfig, "AUTH_APP");
+const msgApp  = initializeApp(messageConfig, "MSG_APP");
+
+const auth = getAuth(authApp);
+const db   = getDatabase(msgApp);
+
+/* =========================
+   ELEMENTS
+========================= */
+const loginForm     = document.getElementById("loginForm");
+const loginCard     = document.getElementById("loginCard");
+const formContainer = document.getElementById("formContainer");
+const lookupForm    = document.getElementById("lookupForm");
+const displayGrid   = document.getElementById("displayGrid");
+const logoutBtn     = document.getElementById("logoutBtn");
+
+/* =========================
+   LOGIN
+========================= */
+loginForm.addEventListener("submit", e => {
+  e.preventDefault();
+  signInWithEmailAndPassword(
+    auth,
+    loginForm.email.value,
+    loginForm.password.value
+  ).catch(err => alert(err.message));
+});
+
+/* =========================
+   AUTH STATE
+========================= */
+onAuthStateChanged(auth, user => {
+  if (user) {
+    loginCard.classList.add("hidden");
+    formContainer.classList.remove("hidden");
+
+    lookupForm.email.value = user.email;
+    lookupForm.email.readOnly = true;
+  } else {
+    loginCard.classList.remove("hidden");
+    formContainer.classList.add("hidden");
+  }
+});
+
+/* =========================
+   LOGOUT
+========================= */
+logoutBtn.onclick = () => signOut(auth);
+
+/* =========================
+   SEND MESSAGE
+========================= */
+lookupForm.addEventListener("submit", e => {
+  e.preventDefault();
+
+  if (
+    !lookupForm.phone.value.startsWith("+") ||
+    !lookupForm.whatsapp.value.startsWith("+")
+  ) {
+    alert("Phone & WhatsApp must include country code (+)");
+    return;
+  }
+
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+const expireAt = Date.now() + sevenDaysMs;     // timestamp when message should expire
+
+push(ref(db, "Lookup"), {
+  senderUID: auth.currentUser.uid,
+  senderEmail: auth.currentUser.email,
+  name: lookupForm.name.value,
+  phone: lookupForm.phone.value,
+  whatsapp: lookupForm.whatsapp.value,
+  category: lookupForm.category.value,
+  currency: lookupForm.priceCurrency.value,
+  amount: lookupForm.priceAmount.value,
+  description: lookupForm.description.value,
+  image: lookupForm.image.value || "",
+  dateSent: new Date().toISOString(),
+  expireAt: expireAt  // <-- message will expire 7 days later
+});
+  
+  lookupForm.reset();
+  lookupForm.email.value = auth.currentUser.email;
+});
+
+/* =========================
+   READ & DISPLAY MESSAGES
+========================= */
+onValue(ref(db, "Lookup"), snapshot => {
+  displayGrid.innerHTML = "";
+  const messages = [];
+
+  snapshot.forEach(child => {
+    const d = child.val();
+    const key = child.key;
+
+    // Auto-delete if older than 7 days
+    const sevenDays = 7 * 24 * 60 * 60 * 1000; // ms
+    if (d.dateSent && (new Date() - new Date(d.dateSent)) > sevenDays) {
+      // remove old message
+      push(ref(db, "Deleted")); // optional log node
+      db.ref(`Lookup/${key}`).remove?.();
+      return; // skip rendering
+    }
+
+    messages.push({ key, data: d });
+  });
+
+  // Render newest first
+  messages.reverse().forEach(item => {
+    const d = item.data;
+
+    const waText = encodeURIComponent(
+`Hello ${d.name},
+*I saw your request on Shopping Arena*
+
+📩 Email: ${d.senderEmail}
+📦 Category: ${d.category}
+💰 Budget: ${d.currency} ${d.amount}
+📞 Phone: ${d.phone}
+📅 Date: ${d.dateSent ? new Date(d.dateSent).toLocaleString() : "N/A"}
+
+Description:
+${d.description}`
+    );
+
+    displayGrid.innerHTML += `
+      <div class="card">
+        ${d.image ? `<img src="${d.image}">` : ""}
+        <div class="card-body">
+          <h4>${d.name}</h4>
+          <p><b>Email:</b> ${d.senderEmail}</p>
+          <p><b>Category:</b> ${d.category}</p>
+          <p><b>Budget:</b> ${d.currency} ${d.amount}</p>
+          <p>${d.description}</p>
+          <p><small>${d.dateSent ? new Date(d.dateSent).toLocaleString() : ""}</small></p>
+
+          <a target="_blank"
+            href="https://wa.me/${d.whatsapp.replace(/[^0-9]/g,"")}?text=${waText}">
+            <button>Reply on WhatsApp</button>
+          </a>
+        </div>
+      </div>
+    `;
+  });
+});
+</script>
+
+</head>
+<body>
+
+<h1> what you want to buy</h1>
+
+<!-- Login Card -->
+<div class="form-container" id="loginCard">
+  <h2>Login to Send Message</h2>
+  <form id="loginForm">
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+<!-- Lookup Form -->
+<div class="form-container hidden" id="formContainer">
+  <button id="logoutBtn" class="logout-btn">Logout</button>
+  <form id="lookupForm">
+    <input type="text" name="name" placeholder="Your Name" required />
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="text" name="phone" placeholder="Phone Number (+123456789)" required />
+    <input type="text" name="whatsapp" placeholder="WhatsApp Number (+123456789)" required />
+    <input type="text" name="category" placeholder="Category you want to buy" required />
+    <select name="priceCurrency" required>
+  <option value="">Select Currency</option>
+  <option value="UGX">UGX (Ugandan Shillings)</option>
+  <option value="KSH">KSH (Kenyan Shillings)</option>
+  <option value="USD">USD (Dollars)</option>
+</select>
+
+<input 
+  type="number" 
+  name="priceAmount" 
+  placeholder="Enter Price Amount" 
+  required
+/>
+    <textarea name="description" placeholder="Description of what you want" required></textarea>
+    <input type="url" name="image" placeholder="Image URL (optional)" />
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<div class="section">
+  <h2>Submitted Requests</h2>
+  <div class="grid" id="displayGrid">
+    <!-- Messages appear here -->
+  </div>
+</div>
+
+</body>
+</html>
+
+</body>
+</html>

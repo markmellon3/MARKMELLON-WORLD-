@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Detail</title>
+  <style>
+    body {
+      background-color: #0a0a0a;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #111;
+      padding: 12px 16px;
+      z-index: 1000;
+      border-bottom: 1px solid #1e1e1e;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      color: #00b53f;
+      font-size: 24px;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .main-image-container {
+      margin-top: 60px;
+      background: #111;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .main-image {
+      max-width: 100%;
+      max-height: 420px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: #181818;
+    }
+
+    .content {
+      padding: 16px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 0 0 12px 0;
+      color: #ffffff;
+    }
+
+    .price-container {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .current-price {
+      color: #00b53f;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .old-price {
+      color: #888;
+      font-size: 18px;
+      text-decoration: line-through;
+    }
+
+    .discount-badge {
+      background: #ff4444;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      align-self: flex-start;
+    }
+
+    .meta {
+      color: #aaa;
+      font-size: 14px;
+      margin: 16px 0;
+    }
+
+    .meta strong {
+      color: #ddd;
+    }
+
+    .description {
+      margin: 20px 0;
+      color: #ccc;
+    }
+
+    .description h3 {
+      color: #ffffff;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #111;
+      border-top: 1px solid #1e1e1e;
+      padding: 12px 16px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-call {
+      background: #00b53f;
+      color: white;
+    }
+
+    .btn-chat {
+      background: #ff6200;
+      color: white;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #888;
+    }
+
+    .error {
+      text-align: center;
+      padding: 40px;
+      color: #ff4444;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="javascript:history.back()" class="back-btn">←</a>
+    <div style="font-size:18px; font-weight:600;">Product Detail</div>
+  </header>
+
+  <div class="main-image-container">
+    <img id="mainImage" class="main-image" src="" alt="Product" />
+  </div>
+
+  <div class="content" id="content">
+    <div class="loading">Loading product details...</div>
+  </div>
+
+  <div class="action-bar" id="actionBar" style="display:none;">
+    <button class="btn btn-call" id="callBtn">Call Seller</button>
+    <button class="btn btn-chat" id="chatBtn">Chat with Seller</button>
+  </div>
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+  /* ================= FIREBASE CONFIGS ================= */
+  const firebaseConfigs = [
+  {
+    config: {
+      apiKey: "AIzaSyBSvsfXPXdwN-rh2KWvV7urUl_aEuqdOuE",
+      authDomain: "jordanshop-5f754.firebaseapp.com",
+      databaseURL: "https://jordanshop-5f754-default-rtdb.firebaseio.com",
+      projectId: "jordanshop-5f754",
+      storageBucket: "jordanshop-5f754.firebasestorage.app",
+      messagingSenderId: "99289233170",
+      appId: "1:99289233170:web:5b67672a133d7ff677a5cb"
+    },
+    name: "SHOP_APP"
+  },
+
+  {
+    config: {
+      apiKey: "AIzaSyCI1yBIgDhl7cnKjCzOaWt4vK2Q-DcQrac",
+      authDomain: "essie-db2aa.firebaseapp.com",
+      databaseURL: "https://essie-db2aa-default-rtdb.firebaseio.com",
+      projectId: "essie-db2aa",
+      storageBucket: "essie-db2aa.appspot.com",
+      messagingSenderId: "210132046846",
+      appId: "1:210132046846:web:5fac8fedce997553cda6af"
+    },
+    name: "ADS_APP"
+  },
+
+  {
+    config: {
+      apiKey: "AIzaSyBApMxWRcVprqQSK2APR4DPyeNOCZt9nYs",
+      authDomain: "urban-bakers.firebaseapp.com",
+      projectId: "urban-bakers",
+      storageBucket: "urban-bakers.firebasestorage.app",
+      messagingSenderId: "36530216028",
+      appId: "1:36530216028:web:653a400178b50fb0749a99",
+      measurementId: "G-5SZ3N9JYZZ"
+    },
+    name: "URBAN_BAKERS"
+  },
+
+  // ← New one added here
+  {
+    config: {
+      apiKey: "AIzaSyB4EuBBs7zA9sC4VFGQstWQfK2tp1qQDJg",
+      authDomain: "jonaphones-fc804.firebaseapp.com",
+      projectId: "jonaphones-fc804",
+      storageBucket: "jonaphones-fc804.firebasestorage.app",
+      messagingSenderId: "962281497557",
+      appId: "1:962281497557:web:0dfc3100acccd47a5fd35c",
+      measurementId: "G-7CHGV2XK8G"
+    },
+    name: "JONA_PHONES"   // ← Feel free to change this name to something that fits your code
+  }
+
+];
+
+  const apps = firebaseConfigs.map(fb => initializeApp(fb.config, fb.name));
+  const dbs  = apps.map((app, i) => ({ db: getDatabase(app), name: firebaseConfigs[i].name }));
+
+  /* ================= URL PARAMS ================= */
+  const params   = new URLSearchParams(window.location.search);
+  const itemId   = params.get("id");
+  const category = params.get("category");
+  const dbName   = params.get("db");
+
+  const contentDiv = document.getElementById("content");
+  const imgEl      = document.getElementById("mainImage");
+  const actionBar  = document.getElementById("actionBar");
+  const callBtn    = document.getElementById("callBtn");
+  const chatBtn    = document.getElementById("chatBtn");
+
+  if (!itemId || !category || !dbName) {
+    contentDiv.innerHTML = `<div class="error">Invalid product link.</div>`;
+    imgEl.src = "https://via.placeholder.com/400x400?text=No+Image";
+    throw new Error("Missing URL params");
+  }
+
+  const selectedDb = dbs.find(d => d.name === dbName);
+  if (!selectedDb) {
+    contentDiv.innerHTML = `<div class="error">Database not found.</div>`;
+    throw new Error("DB not found");
+  }
+
+  const itemRef = ref(selectedDb.db, `catalogs/${category}/${itemId}`);
+
+  get(itemRef)
+    .then(snapshot => {
+      if (!snapshot.exists()) {
+        contentDiv.innerHTML = `<div class="error">Product not found.</div>`;
+        imgEl.src = "https://via.placeholder.com/400x400?text=No+Image";
+        return;
+      }
+
+      const item = snapshot.val();
+      console.log("ITEM DATA:", item);
+
+      /* ================= IMAGE FIX ================= */
+      const imageUrl =
+        item.image ||
+        item.imageUrl ||
+        item.imageURL ||
+        (Array.isArray(item.images) ? item.images[0] : null);
+
+      imgEl.src = imageUrl || "https://via.placeholder.com/400x400?text=No+Image";
+      imgEl.onerror = () => {
+        imgEl.src = "https://via.placeholder.com/400x400?text=Image+Unavailable";
+      };
+
+      /* ================= CONTENT RENDER ================= */
+      let html = `
+        <h1 class="title">${item.name || "Unnamed Product"}</h1>
+
+        <div class="price-container">
+          <span class="current-price">
+            ${item.price ? `USh ${Number(item.price).toLocaleString()}` : "Price on request"}
+          </span>
+          ${item.oldPrice ? `<span class="old-price">USh ${Number(item.oldPrice).toLocaleString()}</span>` : ""}
+          ${item.discount ? `<span class="discount-badge">-${item.discount}%</span>` : ""}
+        </div>
+      `;
+
+      /* ================= META ================= */
+      const meta = [];
+      if (item.stock !== undefined) meta.push(`<strong>Stock:</strong> ${item.stock}`);
+      if (item.category) meta.push(`<strong>Category:</strong> ${item.category}`);
+      if (item.createdAt) meta.push(`<strong>Posted:</strong> ${new Date(item.createdAt).toLocaleDateString()}`);
+
+      if (meta.length) {
+        html += `<div class="meta">${meta.join(" • ")}</div>`;
+      }
+
+      /* ================= DESCRIPTION ================= */
+      if (item.description) {
+        html += `
+          <div class="description">
+            <h3>Description</h3>
+            <p>${item.description.replace(/\n/g, "<br>")}</p>
+          </div>
+        `;
+      }
+
+      contentDiv.innerHTML = html;
+
+      /* ================= ACTION BUTTONS ================= */
+      if (item.phone) {
+        const cleanPhone = item.phone.replace(/\D/g, "");
+
+        callBtn.textContent = `Call ${item.phone}`;
+        callBtn.onclick = () => window.location.href = `tel:${cleanPhone}`;
+
+        chatBtn.onclick = () => {
+          const msg = encodeURIComponent(
+            `Hello 👋\n\nI’m interested in this item:\n\n` +
+            `• Name: ${item.name}\n` +
+            `• Price: ${item.price ? "USh " + Number(item.price).toLocaleString() : "On request"}\n\n` +
+            `Image:\n${imageUrl || "N/A"}`
+          );
+          window.open(`https://wa.me/${cleanPhone}?text=${msg}`, "_blank");
+        };
+
+        actionBar.style.display = "flex";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      contentDiv.innerHTML = `<div class="error">Failed to load product.</div>`;
+    });
+</script>
+<style>
+  /* Make sure the page can scroll normally */
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Example container — adjust as needed */
+  .container {
+    width: 100%;
+    max-width: 1200px;          /* never wider than this on big screens */
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+  }
+
+  /* Fluid images / media */
+  img, video, iframe {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Typical mobile → tablet → desktop breakpoints */
+  @media (max-width: 767px) {
+    /* Phones & small tablets */
+    body {
+      font-size: 16px;          /* base size good for mobile */
+    }
+    .container {
+      padding: 0 10px;
+    }
+    /* hide/show things, change layout to column, etc. */
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    /* Tablets */
+    body {
+      font-size: 17px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    /* Desktop and larger */
+    body {
+      font-size: 18px;
+    }
+  }
+</style>
+</body>
+</html>

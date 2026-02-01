@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products -</title>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+        }
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: #111;
+            padding: 10px 15px;
+            z-index: 1000;
+            border-bottom: 1px solid #1e1e1e;
+        }
+        .search-bar {
+            width: 100%;
+            padding: 12px 16px;
+            background: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .search-bar::placeholder { color: #888; }
+        .categories {
+            display: flex;
+            overflow-x: auto;
+            padding: 70px 15px 12px;
+            gap: 10px;
+            background: #0a0a0a;
+        }
+        .categories::-webkit-scrollbar { display: none; }
+        .category {
+            flex-shrink: 0;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #ccc;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .category.active {
+            background: #00b53f;
+            color: white;
+            border-color: #00b53f;
+            font-weight: 600;
+        }
+        .found-info {
+            padding: 0 15px 8px;
+            font-size: 13px;
+            color: #aaa;
+        }
+        .listings {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 10px;
+            padding: 8px 15px;
+        }
+        .listing {
+            background: #111;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid #1e1e1e;
+        }
+        .listing img {
+            width: 100%;
+            aspect-ratio: 1 / 1.1;
+            object-fit: cover;
+            background: #181818;
+        }
+        .listing-info {
+            padding: 8px 10px;
+        }
+        .price {
+            color: #00b53f;
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        .old-price {
+            color: #888;
+            font-size: 13px;
+            text-decoration: line-through;
+            margin-left: 6px;
+        }
+        .title {
+            font-size: 14px;
+            line-height: 1.3;
+            margin: 4px 0 6px;
+            color: #f5f5f5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .meta {
+            font-size: 12px;
+            color: #999;
+        }
+        .discount {
+            color: #ff4444;
+            font-weight: 600;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <input type="text" class="search-bar" placeholder="Search products..." id="searchInput">
+    </div>
+
+    <div class="categories">
+        <div class="category active" data-category="">All</div>
+        <!-- Categories will be auto-populated from Firebase -->
+    </div>
+
+    <div class="found-info" id="foundInfo">Found 0 items</div>
+
+    <div class="listings" id="listingsContainer"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+        const firebaseConfigs = [
+  {
+    config: {
+      apiKey: "AIzaSyBSvsfXPXdwN-rh2KWvV7urUl_aEuqdOuE",
+      authDomain: "jordanshop-5f754.firebaseapp.com",
+      databaseURL: "https://jordanshop-5f754-default-rtdb.firebaseio.com",
+      projectId: "jordanshop-5f754",
+      storageBucket: "jordanshop-5f754.firebasestorage.app",
+      messagingSenderId: "99289233170",
+      appId: "1:99289233170:web:5b67672a133d7ff677a5cb"
+    },
+    name: "SHOP_APP"
+  },
+
+  {
+    config: {
+      apiKey: "AIzaSyCI1yBIgDhl7cnKjCzOaWt4vK2Q-DcQrac",
+      authDomain: "essie-db2aa.firebaseapp.com",
+      databaseURL: "https://essie-db2aa-default-rtdb.firebaseio.com",
+      projectId: "essie-db2aa",
+      storageBucket: "essie-db2aa.appspot.com",
+      messagingSenderId: "210132046846",
+      appId: "1:210132046846:web:5fac8fedce997553cda6af"
+    },
+    name: "ADS_APP"
+  },
+
+  {
+    config: {
+      apiKey: "AIzaSyBApMxWRcVprqQSK2APR4DPyeNOCZt9nYs",
+      authDomain: "urban-bakers.firebaseapp.com",
+      projectId: "urban-bakers",
+      storageBucket: "urban-bakers.firebasestorage.app",
+      messagingSenderId: "36530216028",
+      appId: "1:36530216028:web:653a400178b50fb0749a99",
+      measurementId: "G-5SZ3N9JYZZ"
+    },
+    name: "URBAN_BAKERS"
+  },
+
+  // ← New one added here
+  {
+    config: {
+      apiKey: "AIzaSyB4EuBBs7zA9sC4VFGQstWQfK2tp1qQDJg",
+      authDomain: "jonaphones-fc804.firebaseapp.com",
+      projectId: "jonaphones-fc804",
+      storageBucket: "jonaphones-fc804.firebasestorage.app",
+      messagingSenderId: "962281497557",
+      appId: "1:962281497557:web:0dfc3100acccd47a5fd35c",
+      measurementId: "G-7CHGV2XK8G"
+    },
+    name: "JONA_PHONES"   // ← Feel free to change this name to something that fits your code
+  }
+
+];
+        const apps = firebaseConfigs.map(fb => initializeApp(fb.config, fb.name));
+        const dbs = apps.map((app, i) => ({ db: getDatabase(app), name: firebaseConfigs[i].name }));
+
+        let allListings = [];
+        let categoriesSet = new Set();
+        let currentSearch = "";
+        let currentCategory = "";
+
+        function loadFromDb({ db, name: dbName }) {
+          const catalogsRef = ref(db, "catalogs");
+          onValue(catalogsRef, (snapshot) => {
+            if (!snapshot.exists()) return;
+
+            snapshot.forEach((categorySnap) => {
+              const categoryName = categorySnap.key; // e.g. "Charger", "IPhone"
+              categoriesSet.add(categoryName);
+
+              categorySnap.forEach((itemSnap) => {
+                const key = itemSnap.key;
+                const data = itemSnap.val();
+                allListings.push({
+                  id: key,
+                  category: categoryName,
+                  dbName,
+                  ...data
+                });
+              });
+            });
+
+            // Update categories UI once
+            updateCategories();
+            renderListings();
+          });
+        }
+
+        dbs.forEach(loadFromDb);
+
+        function updateCategories() {
+          const container = document.querySelector('.categories');
+          // Keep "All"
+          const allBtn = container.querySelector('[data-category=""]');
+          // Add dynamic ones
+          categoriesSet.forEach(cat => {
+            if (!container.querySelector(`[data-category="${cat}"]`)) {
+              const div = document.createElement('div');
+              div.className = 'category';
+              div.dataset.category = cat;
+              div.textContent = cat;
+              div.addEventListener('click', () => {
+                document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
+                div.classList.add('active');
+                currentCategory = cat;
+                renderListings();
+              });
+              container.appendChild(div);
+            }
+          });
+        }
+
+        function renderListings() {
+          const container = document.getElementById('listingsContainer');
+          const foundEl = document.getElementById('foundInfo');
+          container.innerHTML = '';
+
+          let filtered = allListings;
+
+          if (currentSearch.trim()) {
+            const q = currentSearch.toLowerCase().trim();
+            filtered = filtered.filter(item =>
+              (item.name?.toLowerCase().includes(q)) ||
+              (item.description?.toLowerCase().includes(q))
+            );
+          }
+
+          if (currentCategory) {
+            filtered = filtered.filter(item => item.category === currentCategory);
+          }
+
+          foundEl.textContent = `Found ${filtered.length} items`;
+
+          filtered.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'listing';
+
+            const imgSrc = item.image || 'https://via.placeholder.com/300?text=No+Image';
+            const title = item.name || 'No name';
+            const price = item.price ? `USh ${Number(item.price).toLocaleString()}` : 'Contact for price';
+            let priceHtml = `<span class="price">${price}</span>`;
+            if (item.oldPrice) {
+              priceHtml += `<span class="old-price">USh ${Number(item.oldPrice).toLocaleString()}</span>`;
+            }
+            let discountHtml = item.discount ? `<span class="discount">-${item.discount}%</span>` : '';
+
+            div.innerHTML = `
+  <img src="${imgSrc}" alt="${title}" onerror="this.src='https://via.placeholder.com/300?text=Load+Error'">
+  <div class="listing-info">
+    <div>${priceHtml} ${discountHtml}</div>
+    <div class="title">${title}</div>
+    <div class="meta">
+      ${item.stock ? `Stock: ${item.stock}` : ''}
+      ${item.phone ? `• ${item.phone}` : ''}
+    </div>
+  </div>
+`;
+              
+
+            div.addEventListener('click', () => {
+              const params = new URLSearchParams({
+                id: item.id,
+                category: item.category,
+                db: item.dbName
+              });
+              window.location.href = `detail.html?${params.toString()}`;
+            });
+
+            container.appendChild(div);
+          });
+        }
+
+        // Search input
+        document.getElementById('searchInput').addEventListener('input', e => {
+          currentSearch = e.target.value;
+          renderListings();
+        });
+
+        // "All" category click
+        document.querySelector('.category[data-category=""]').addEventListener('click', () => {
+          document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
+          document.querySelector('.category[data-category=""]').classList.add('active');
+          currentCategory = "";
+          renderListings();
+        });
+
+        // Initial render
+        renderListings();
+    </script>
+    <style>
+  /* Make sure the page can scroll normally */
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Example container — adjust as needed */
+  .container {
+    width: 100%;
+    max-width: 1200px;          /* never wider than this on big screens */
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+  }
+
+  /* Fluid images / media */
+  img, video, iframe {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Typical mobile → tablet → desktop breakpoints */
+  @media (max-width: 767px) {
+    /* Phones & small tablets */
+    body {
+      font-size: 16px;          /* base size good for mobile */
+    }
+    .container {
+      padding: 0 10px;
+    }
+    /* hide/show things, change layout to column, etc. */
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    /* Tablets */
+    body {
+      font-size: 17px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    /* Desktop and larger */
+    body {
+      font-size: 18px;
+    }
+  }
+</style>
+</body>
+</html>

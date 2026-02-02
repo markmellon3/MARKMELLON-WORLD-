@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Item Details</title>
+
+<style>
+:root {
+  --bg: #121212;
+  --card: #1e1e24;
+  --text: #e0e0e0;
+  --accent: #4caf50;
+  --danger: #e53935;
+  --gray: #888;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 16px;
+}
+
+.container { max-width: 900px; margin: auto; }
+
+.back-btn {
+  background: #2a2a2a;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.details-card {
+  background: var(--card);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+.details-image {
+  width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  background: #0d0d0d;
+}
+
+.details-body { padding: 24px; }
+
+.top-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+select, input, textarea {
+  width: 100%;
+  padding: 12px;
+  background: #0f0f0f;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #fff;
+}
+
+textarea { resize: vertical; }
+
+h1 { font-size: 1.9rem; margin-bottom: 12px; }
+
+.meta { color: var(--gray); margin-bottom: 20px; }
+
+.price-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.current-price {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.total-price {
+  margin-top: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.section-title {
+  margin: 20px 0 8px;
+  color: #bbb;
+}
+
+.contact-section {
+  background: #181818;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 24px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media(min-width: 640px) {
+  .action-buttons { flex-direction: row; }
+}
+
+.btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+}
+
+.btn-call { background: #1976d2; }
+.btn-whatsapp { background: #25D366; }
+
+.policy-note {
+  margin-top: 40px;
+  padding: 14px;
+  background: #101010;
+  border-left: 4px solid var(--accent);
+  color: #bbb;
+  font-size: 0.95rem;
+}
+
+/* LOCATION SEARCH */
+.location-box { position: relative; }
+.location-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #0f0f0f;
+  border: 1px solid #333;
+  border-radius: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  display: none;
+  z-index: 20;
+}
+.location-results div {
+  padding: 10px 12px;
+  cursor: pointer;
+}
+.location-results div:hover { background: #1f1f1f; }
+
+</style>
+</head>
+
+<body>
+<div class="container">
+  <button class="back-btn" onclick="history.back()">← Back</button>
+  <div id="content"></div>
+</div>
+<script>
+/* ========================
+   LANGUAGE DATA
+======================== */
+const languages = {
+  en: {
+    contact: "Contact Seller",
+    qty: "Quantity",
+    inst: "Installment Inquiry (optional)",
+    chat: "Chat on WhatsApp",
+    call: "Call Seller",
+    total: "Total",
+    policy: "Please pay after delivery or after receiving the package",
+    loc: "Location"
+  },
+  fr: {
+    contact: "Contacter le vendeur",
+    qty: "Quantité",
+    inst: "Paiement échelonné (optionnel)",
+    chat: "WhatsApp",
+    call: "Appeler",
+    total: "Total",
+    policy: "Veuillez payer après la livraison",
+    loc: "Localisation"
+  },
+  sw: {
+    contact: "Wasiliana na muuzaji",
+    qty: "Idadi",
+    inst: "Malipo ya awamu (hiari)",
+    chat: "WhatsApp",
+    call: "Piga simu",
+    total: "Jumla",
+    policy: "Lipa baada ya kupokea kifurushi",
+    loc: "Mahali"
+  }
+};
+let currentLang = "en";
+
+/* ========================
+   CURRENCY DATA
+======================== */
+let currentCurrency = "UGX"; // Default currency
+function money(amount) { return new Intl.NumberFormat(navigator.language,{ style:"currency", currency:currentCurrency }).format(amount); }
+
+/* ========================
+   LOCATION DATA
+======================== */
+const locations = [
+  "Kampala","Wakiso","Mukono","Entebbe","Jinja","Masaka","Mbarara",
+  "Mbale","Gulu","Arua","Hoima","Fort Portal","Soroti","Lira",
+  "Kasangati","Bweyogerere","Seeta","Lugazi","Kayunga","Mityana",
+  "Mubende","Kabale","Kasese","Tororo","Busia","Wobulenzi","Kalisizo"
+];
+
+/* ========================
+   GET ITEM FROM URL
+======================== */
+const p = new URLSearchParams(location.search);
+const item = {
+  name: p.get("name") || "Unknown Item",
+  price: Number(p.get("price")) || 0,
+  oldPrice: Number(p.get("oldPrice")) || null,
+  discount: p.get("discount") || null,
+  stock: p.get("stock") || null,
+  phone: p.get("phone") || "",
+  image: p.get("image") || "https://via.placeholder.com/600",
+  category: p.get("category") || "",
+  description: p.get("description") || ""
+};
+
+/* ========================
+   RENDER FUNCTION
+======================== */
+function render() {
+  const t = languages[currentLang];
+  const cleanPhone = item.phone.replace(/\D/g,"");
+
+  document.getElementById("content").innerHTML = `
+  <div class="details-card">
+    <img class="details-image" src="${item.image}">
+    <div class="details-body">
+
+      <div class="top-controls">
+        <select id="langSel">
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="sw">Swahili</option>
+        </select>
+      </div>
+
+      <h1>${item.name}</h1>
+      <div class="meta">${item.category}</div>
+
+      <div class="price-section">
+        <span class="current-price">${money(item.price)}</span>
+        ${item.oldPrice ? `<span class="old-price" style="text-decoration:line-through; margin-left:8px; color:#888;">${money(item.oldPrice)}</span>` : ""}
+        ${item.discount ? `<span class="discount" style="margin-left:8px; color:#4caf50;">-${item.discount}</span>` : ""}
+      </div>
+
+      <div class="section-title">Description</div>
+      <div>${item.description}</div>
+
+      <div class="contact-section">
+        <div class="section-title">${t.contact}</div>
+
+        <label>${t.qty}</label>
+        <input id="qty" type="number" min="1" value="1">
+
+        <label>${t.inst}</label>
+        <textarea id="inst" placeholder="${t.inst}"></textarea>
+
+        <label>${t.loc}</label>
+        <div class="location-box">
+          <input id="locInput" placeholder="${t.loc}">
+          <div id="locResults" class="location-results"></div>
+        </div>
+
+        <div class="action-buttons">
+          <a href="tel:${cleanPhone}" class="btn btn-call">${t.call}</a>
+          <a href="#" id="wa" class="btn btn-whatsapp">${t.chat}</a>
+        </div>
+      </div>
+
+      <div class="policy-note">${t.policy}</div>
+
+    </div>
+  </div>`;
+
+  // Language
+  document.getElementById("langSel").value = currentLang;
+  document.getElementById("langSel").onchange = e => { currentLang = e.target.value; render(); }
+
+  // Quantity & location autocomplete
+  const qty = document.getElementById("qty");
+  const locInput = document.getElementById("locInput");
+  const locResults = document.getElementById("locResults");
+  locInput.oninput = () => {
+    locResults.innerHTML = "";
+    if (!locInput.value) return locResults.style.display = "none";
+    locations.filter(l => l.toLowerCase().includes(locInput.value.toLowerCase()))
+      .forEach(l => {
+        const d = document.createElement("div");
+        d.textContent = l;
+        d.onclick = () => { locInput.value = l; locResults.style.display = "none"; };
+        locResults.appendChild(d);
+      });
+    locResults.style.display = "block";
+  };
+
+  // WhatsApp button
+  document.getElementById("wa").onclick = e => {
+    e.preventDefault();
+    const inst = document.getElementById("inst").value.trim();
+    const loc = locInput.value.trim();
+
+    let msg = `🛒 *Hello! Am interested in this item*\n\n` +
+              `📰*Name:* ${item.name}\n` +
+              `💰*Price:* ${money(item.price)}\n` +
+              (item.oldPrice ? `💲*Old Price:* ${money(item.oldPrice)}\n` : "") +
+              (item.discount ? `🚫*Discount:* ${item.discount}\n` : "") +
+              (item.stock ? `💹*Stock:* ${item.stock}\n` : "") +
+              `📞*Contact Phone:* ${item.phone}\n` +
+              `📄*Description:* ${item.description}\n` +
+              (item.image ? `🖼️*Image Link:* ${item.image}\n` : "") +
+              `💹*Quantity:* ${qty.value}\n` +
+              (loc ? `🪧*Location:* ${loc}\n` : "") +
+              (inst ? `🗞️*Installment/Note:* ${inst}` : "");
+
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, "_blank");
+  };
+}
+
+render();
+</script>
+
+</body>
+</html>

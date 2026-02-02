@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Home - MARK MELLON WORLD </title>
+  <title>Home - TRADE LOOP </title>
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" sizes="96x96" />
 <link rel="icon" type="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" href="/favicon.svg" />
@@ -532,7 +532,7 @@
     <section class="hero" id="heroSection">
   <div class="hero-content">
     <div>
-      <h2>WELCOME TO PLACE OF WONDERS </h2>
+      <h2>WELCOME TO TRADE LOOP </h2>
       <p>
         Welcome! Explore, discover, and enjoy your journey here.Every great journey begins with a single click. Here is Where ideas come to life. Start here. Go anywhere.
       </p>
@@ -557,8 +557,8 @@
     <a href="#" class="category-btn"><div class="category-icon">🔥</div><div class="category-name">Trending</div></a>
     <a href="#" class="category-btn"><div class="category-icon">🚗</div><div class="category-name">Vehicles</div></a>
     <a href="#" class="category-btn"><div class="category-icon">🏠</div><div class="category-name">Property</div></a>
-    <a href="#" class="category-btn"><div class="category-icon">📱</div><div class="category-name">Phones</div></a>
-    <a href="#" class="category-btn"><div class="category-icon">💻</div><div class="category-name">Electronics</div></a>
+    <a href="phones.html" class="category-btn"><div class="category-icon">📱</div><div class="category-name">Phones</div></a>
+    <a href="electronice.html" class="category-btn"><div class="category-icon">💻</div><div class="category-name">Electronics</div></a>
     <a href="#" class="category-btn"><div class="category-icon">🛋️</div><div class="category-name">Home</div></a>
     <a href="#" class="category-btn"><div class="category-icon">👗</div><div class="category-name">Fashion</div></a>
     <a href="#" class="category-btn"><div class="category-icon">🧴</div><div class="category-name">Beauty</div></a>
@@ -643,11 +643,11 @@
 ];
 
     const apps = firebaseConfigs.map(fb => initializeApp(fb.config, fb.name));
-    const dbs = apps.map((app, i) => ({ db: getDatabase(app), name: firebaseConfigs[i].name }));
+const dbs = apps.map((app, i) => ({ db: getDatabase(app), name: firebaseConfigs[i].name }));
 
-    let allListings = [];
+let allListings = [];
 
-    let currentSearch = ""; // global search query
+let currentSearch = ""; // global search query
 
 function loadFromDb({ db, name }) {
   console.log(`Starting listener for: ${name}`);
@@ -667,7 +667,9 @@ function loadFromDb({ db, name }) {
             price: Number(data.price) || 0,
             phone: data.phone || "",
             image: data.image || "https://via.placeholder.com/300x300/1e1e24/888?text=No+Image",
-            category: category
+            category: category,
+            description: data.description || "",
+            oldPrice: Number(data.oldPrice) || 0
           });
         });
       });
@@ -691,6 +693,8 @@ function loadFromDb({ db, name }) {
 
 dbs.forEach(loadFromDb);
 
+// ... (keep all the code above renderListings unchanged)
+
 function renderListings(listings, searchQuery = "") {
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
@@ -711,8 +715,13 @@ function renderListings(listings, searchQuery = "") {
   filtered.forEach(item => {
     const card = document.createElement("div");
     card.className = "ad-card";
+    card.style.cursor = "pointer";
+
+    // FIXED template literal – use ${...} correctly inside backticks
     card.innerHTML = `
-      <img src="${item.image}" class="ad-image" alt="${item.name}" 
+      <img src="${item.image}" 
+           class="ad-image" 
+           alt="${item.name}"
            onerror="this.src='https://via.placeholder.com/300x300/1e1e24/888?text=Image+Failed';">
       <div class="ad-content">
         <div class="ad-title">${item.name}</div>
@@ -721,23 +730,37 @@ function renderListings(listings, searchQuery = "") {
           Kampala, Central Division<br>
           <span class="condition">${item.category || "Uncategorized"}</span>
         </div>
-
-        ${item.phone ? `
-          <div class="phone" style="margin:10px 0 6px;color:#ccc;">📞 ${item.phone}</div>
-          <input type="number" placeholder="Qty" min="1" value="1" id="qty-${encodeURIComponent(item.name)}"
-                 style="width:100%;margin:6px 0;padding:8px;border-radius:6px;border:1px solid #444;background:#222;color:#eee;">
-          <button class="call-btn" onclick="window.location.href='tel:${item.phone.replace(/\D/g,'')}'">
-            CALL SELLER
-          </button>
-          <button class="whatsapp-btn" onclick="sendWhatsApp('${encodeURIComponent(item.name)}', ${item.price}, '${encodeURIComponent(item.image)}', '${item.phone}', '${encodeURIComponent(item.category)}')">
-            WHATSAPP ORDER
-          </button>
-        ` : '<div style="color:#888;margin-top:10px;">No contact</div>'}
       </div>
     `;
+
+    card.addEventListener('click', () => {
+      openItemDetails(item);
+    });
+
     grid.appendChild(card);
   });
 }
+
+function openItemDetails(item) {
+  // Build query parameters safely
+  const params = new URLSearchParams();
+
+  params.set("name",        item.name);
+  params.set("price",       item.price);
+  params.set("oldPrice",    item.oldPrice || 0);
+  params.set("phone",       item.phone || "");
+  params.set("image",       item.image);
+  params.set("category",    item.category || "Uncategorized");
+  params.set("description", item.description || "");
+
+  // Option A: same tab navigation (most common for detail pages)
+  window.location.href = `details.html?${params.toString()}`;
+
+  // Option B: open in new tab (if you prefer)
+  // window.open(`details.html?${params.toString()}`, '_blank');
+}
+
+// ... keep the rest (search handler, sendWhatsApp function) unchanged
 
 // Search handler
 document.addEventListener("DOMContentLoaded", () => {
@@ -748,14 +771,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-    window.sendWhatsApp = function(encName, price, encImage, phone, encCategory) {
+window.sendWhatsApp = function(encName, price, encImage, phone, encCategory) {
   const name = decodeURIComponent(encName);
   const image = decodeURIComponent(encImage); // must be a public URL
   const category = decodeURIComponent(encCategory);
-
-  // Get quantity input
-  const qtyInput = document.getElementById(`qty-${encName}`);
-  const qty = qtyInput ? qtyInput.value || 1 : 1;
 
   // Clean phone number
   const cleanPhone = phone.replace(/\D/g, '');
@@ -767,19 +786,18 @@ document.addEventListener("DOMContentLoaded", () => {
 🛒 Item: ${name}
 💰 Price: USh ${Number(price).toLocaleString()}
 📂 Category: ${category}
-🔢 Quantity: ${qty}
 
 🖼 Check the image: ${image}
 
 🌐 Visit the site: ${location.origin}
   `;
 
-  const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(messageText)}`;
+  const waUrl = `https://wa.me/\( {cleanPhone}?text= \){encodeURIComponent(messageText)}`;
 
   console.log("Opening WhatsApp with preview message:", messageText);
   window.open(waUrl, '_blank');
 };
-
+      
   </script>
 
   <style>
@@ -1081,7 +1099,7 @@ onValue(heroRef, snapshot => {
   <nav class="sidebar-nav">
   <button class="nav-btn" onclick="location.href='mm-onlineshoppingarena.html'">🛒shopping Arena</button>
   <button class="nav-btn" onclick="location.href='photos.html'">🖼️ Photos</button>
-  <button class="nav-btn" onclick="location.href='about.html'">ℹ️ About</button>
+  <button class="nav-btn" onclick="location.href='about1.html'">ℹ️ About</button>
   <button class="nav-btn" onclick="location.href='contact.html'">📞 Contact</button>
   <button class="nav-btn" onclick="location.href='help.html'">❓ Help</button>
 </nav>
@@ -1353,10 +1371,7 @@ onValue(maintenanceRef, snap => {
 </script>
 
 
-    <!-- Navigation button -->
-    <a href="googleimage.html" class="navigate-btn">ADD TO GOOGLE </a>
-  </div>
-</div>
+   
 <style>
 :root {
   --bg: #0f1419;

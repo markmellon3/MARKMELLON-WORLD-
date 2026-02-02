@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trade Loop - Phone Products Only</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" sizes="96x96" />
+<style>
+/* ===== BASE STYLES ===== */
+body {
+  margin: 0;
+  background: #0f172a;
+  font-family: Arial, sans-serif;
+  color: #fff;
+}
+
+h1, h2 {
+  padding: 12px 16px;
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 10px 16px;
+}
+
+.card {
+  background: #1e293b;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.03);
+}
+
+.card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-bottom: 1px solid #334155;
+}
+
+.card-body {
+  padding: 8px;
+}
+
+.card-body h4 {
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.price {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.phone {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+button {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #22c55e;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: #16a34a;
+}
+
+#searchInput {
+  width: 95%;
+  padding: 14px 18px;
+  margin: 12px auto;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid #475569;
+  background-color: #1e293b;
+  color: #f1f5f9;
+  display: block;
+  outline: none;
+}
+
+#searchInput::placeholder {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+#searchResults {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 10px 16px;
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+  h1, h2 {
+    font-size: 18px;
+    padding: 10px 12px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+
+  .card img {
+    height: 100px;
+  }
+
+  .card-body h4 {
+    font-size: 13px;
+  }
+
+  .price {
+    font-size: 12px;
+  }
+
+  button {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  #searchInput {
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+
+  .card img {
+    height: 90px;
+  }
+
+  .card-body h4 {
+    font-size: 12px;
+  }
+
+  .price {
+    font-size: 11px;
+  }
+
+  button {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  #searchInput {
+    width: 90%;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}
+</style>
+</head>
+
+<body>
+<h1>🛒 MW-SHOPPING ARENA ⚡ Phone Products Only</h1>
+<hr>
+<h2>🔌 search any type of phone</h2>
+<input type="text" id="searchInput" placeholder="Search for electric products...">
+
+<div id="searchResults"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+/* ======================
+   Firebase Configs
+====================== */
+const firebaseConfigs = [
+  {
+    config: {
+      apiKey: "AIzaSyBSvsfXPXdwN-rh2KWvV7urUl_aEuqdOuE",
+      authDomain: "jordanshop-5f754.firebaseapp.com",
+      databaseURL: "https://jordanshop-5f754-default-rtdb.firebaseio.com",
+      projectId: "jordanshop-5f754",
+      storageBucket: "jordanshop-5f754.firebasestorage.app",
+      messagingSenderId: "99289233170",
+      appId: "1:99289233170:web:5b67672a133d7ff677a5cb"
+    },
+    name: "SHOP_APP"
+  },
+  {
+    config: {
+      apiKey: "AIzaSyCI1yBIgDhl7cnKjCzOaWt4vK2Q-DcQrac",
+      authDomain: "essie-db2aa.firebaseapp.com",
+      databaseURL: "https://essie-db2aa-default-rtdb.firebaseio.com",
+      projectId: "essie-db2aa",
+      storageBucket: "essie-db2aa.appspot.com",
+      messagingSenderId: "210132046846",
+      appId: "1:210132046846:web:5fac8fedce997553cda6af"
+    },
+    name: "ADS_APP"
+  },
+  {
+    config: {
+      apiKey: "AIzaSyBApMxWRcVprqQSK2APR4DPyeNOCZt9nYs",
+      authDomain: "urban-bakers.firebaseapp.com",
+      projectId: "urban-bakers",
+      storageBucket: "urban-bakers.firebasestorage.app",
+      messagingSenderId: "36530216028",
+      appId: "1:36530216028:web:653a400178b50fb0749a99",
+      measurementId: "G-5SZ3N9JYZZ"
+    },
+    name: "URBAN_BAKERS"
+  }
+];
+
+/* ======================
+   Initialize Apps & Databases
+====================== */
+const dbApps = firebaseConfigs.map(fb => getDatabase(initializeApp(fb.config, fb.name)));
+
+/* ======================
+   Global Products Array
+====================== */
+let allProducts = [];
+
+/* ======================
+   Load Products (Smart Electric Detection)
+====================== */
+const electricKeywords = [
+  
+  // Consumer Electronics
+  "television", "tv", "computer", "laptop", "monitor", "phone", "charger", "tablet", "gaming console",
+  "speaker", "soundbar", "router", "modem", "printer", "streaming device","samsung", 
+  
+];
+
+function loadProducts(db) {
+  return new Promise(resolve => {
+    onValue(ref(db, "catalogs"), snapshot => {
+      if(snapshot.exists()){
+        snapshot.forEach(categorySnap => {
+          categorySnap.forEach(itemSnap => {
+            const p = itemSnap.val();
+            if(!p) return;
+
+            const nameLower = (p.name || "").toLowerCase();
+            const categoryLower = (categorySnap.key || "").toLowerCase();
+            const descLower = (p.description || "").toLowerCase();
+
+            // Smart detection: name OR category OR description
+            const isElectric = electricKeywords.some(keyword =>
+              nameLower.includes(keyword) ||
+              categoryLower.includes(keyword) ||
+              descLower.includes(keyword)
+            );
+
+            if(isElectric){
+              allProducts.push({
+                name: p.name || "",
+                price: p.price || 0,
+                phone: p.phone || "",
+                image: p.image || "",
+                category: categorySnap.key || ""
+              });
+            }
+          });
+        });
+      }
+      resolve();
+    });
+  });
+}
+
+/* ======================
+   Render Products
+====================== */
+const searchResults = document.getElementById("searchResults");
+
+function renderProducts(products){
+  searchResults.innerHTML = "";
+  if(products.length === 0){
+    searchResults.innerHTML = "<p>No electric products found ⚡</p>";
+    return;
+  }
+
+  products.forEach(p=>{
+    searchResults.insertAdjacentHTML("beforeend", `
+      <div class="card">
+        <img src="${p.image}" alt="${p.name}">
+        <div class="card-body">
+          <h4>${p.name}</h4>
+          <div class="price">UGX ${Number(p.price).toLocaleString()}</div>
+          <div style="font-size:11px;color:#aaa;">Category: ${p.category}</div>
+          ${p.phone ? `
+          <div class="phone">📞 ${p.phone}</div>
+          <button onclick="location.href='tel:${p.phone}'">CALL</button>
+          <button onclick="
+            (function(){
+              const message = encodeURIComponent(
+                '🛒 Inquiry for: ${p.name}\\nPrice: UGX ${Number(p.price).toLocaleString()}'
+              );
+              window.open('https://wa.me/${p.phone.replace(/\D/g,'')}?text=' + message, '_blank');
+            })()
+          ">📦 WhatsApp</button>
+          ` : ""}
+        </div>
+      </div>
+    `);
+  });
+}
+
+/* ======================
+   Load All Products from All DBs
+====================== */
+Promise.all(dbApps.map(db => loadProducts(db))).then(()=> renderProducts(allProducts));
+
+/* ======================
+   Search Filter
+====================== */
+const searchInput = document.getElementById("searchInput");
+searchInput.addEventListener("input", e=>{
+  const query = e.target.value.toLowerCase();
+  const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query));
+  renderProducts(filtered);
+});
+</script>
+</body>
+</html>

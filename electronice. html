@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MW-SHOPPING ARENA - Electric Products Only</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://i.ibb.co/jPhkv004/Flyerwiz-1769523471054.webp" sizes="96x96" />
+<style>
+body{
+  margin:0;
+  background:#0f172a;
+  font-family:Arial, sans-serif;
+  color:#fff;
+}
+h1,h2{
+  padding:10px 20px;
+  margin:0;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(150px,1fr));
+  gap:10px;
+}
+.card{
+  background:#1e293b;
+  border-radius:10px;
+  overflow:hidden;
+}
+.card img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+}
+.card-body{
+  padding:6px;
+}
+.card-body h4{
+  font-size:13px;
+  margin:4px 0;
+}
+.price{
+  font-size:12px;
+}
+.phone{
+  font-size:11px;
+  opacity:.8;
+}
+button{
+  width:100%;
+  margin-top:6px;
+  padding:6px;
+  border:none;
+  border-radius:6px;
+  background:#22c55e;
+  font-weight:bold;
+  font-size:12px;
+  cursor:pointer;
+}
+#searchInput {
+  width: 95%;
+  padding: 12px 16px;
+  margin: 10px 20px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid #475569;
+  background-color: #1e293b;
+  color: #f1f5f9;
+  outline: none;
+}
+#searchInput::placeholder {
+  color: #94a3b8;
+}
+#searchResults {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 10px 20px;
+}
+</style>
+</head>
+
+<body>
+<h1>🛒 MW-SHOPPING ARENA ⚡ Electric Products Only</h1>
+<hr>
+<h2>🔌 Search Electric Products</h2>
+<input type="text" id="searchInput" placeholder="Search for electric products...">
+
+<div id="searchResults"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+/* ======================
+   Firebase Configs
+====================== */
+const firebaseConfigs = [
+  {
+    config: {
+      apiKey: "AIzaSyBSvsfXPXdwN-rh2KWvV7urUl_aEuqdOuE",
+      authDomain: "jordanshop-5f754.firebaseapp.com",
+      databaseURL: "https://jordanshop-5f754-default-rtdb.firebaseio.com",
+      projectId: "jordanshop-5f754",
+      storageBucket: "jordanshop-5f754.firebasestorage.app",
+      messagingSenderId: "99289233170",
+      appId: "1:99289233170:web:5b67672a133d7ff677a5cb"
+    },
+    name: "SHOP_APP"
+  },
+  {
+    config: {
+      apiKey: "AIzaSyCI1yBIgDhl7cnKjCzOaWt4vK2Q-DcQrac",
+      authDomain: "essie-db2aa.firebaseapp.com",
+      databaseURL: "https://essie-db2aa-default-rtdb.firebaseio.com",
+      projectId: "essie-db2aa",
+      storageBucket: "essie-db2aa.appspot.com",
+      messagingSenderId: "210132046846",
+      appId: "1:210132046846:web:5fac8fedce997553cda6af"
+    },
+    name: "ADS_APP"
+  },
+  {
+    config: {
+      apiKey: "AIzaSyBApMxWRcVprqQSK2APR4DPyeNOCZt9nYs",
+      authDomain: "urban-bakers.firebaseapp.com",
+      projectId: "urban-bakers",
+      storageBucket: "urban-bakers.firebasestorage.app",
+      messagingSenderId: "36530216028",
+      appId: "1:36530216028:web:653a400178b50fb0749a99",
+      measurementId: "G-5SZ3N9JYZZ"
+    },
+    name: "URBAN_BAKERS"
+  }
+];
+
+/* ======================
+   Initialize Apps & Databases
+====================== */
+const dbApps = firebaseConfigs.map(fb => getDatabase(initializeApp(fb.config, fb.name)));
+
+/* ======================
+   Global Products Array
+====================== */
+let allProducts = [];
+
+/* ======================
+   Load Products (Smart Electric Detection)
+====================== */
+const electricKeywords = [
+  // Heating & Cooling
+  "air conditioner", "space heater", "electric furnace", "heat pump", "ceiling fan", "electric radiator", "underfloor heating",
+  
+  // Water Heating
+  "electric water heater", "immersion heater", "electric shower", "electric boiler",
+  
+  // Refrigeration & Freezing
+  "refrigerator", "freezer", "chest freezer", "wine cooler", "ice maker",
+  
+  // Cooking & Food Preparation
+  "electric oven", "stove", "cooktop", "microwave", "toaster", "toaster oven", "electric kettle", "blender", "food processor",
+  "slow cooker", "rice cooker", "coffee maker", "electric grill", "air fryer", "electric pressure cooker",
+  
+  // Laundry & Cleaning
+  "washing machine", "clothes dryer", "dishwasher", "vacuum cleaner", "steam iron", "carpet cleaner",
+  
+  // Lighting
+  "incandescent bulb", "led bulb", "fluorescent bulb", "halogen bulb", "smart light", "outdoor floodlight",
+  "street light", "chandelier", "desk lamp",
+  
+  // Consumer Electronics
+  "television", "tv", "computer", "laptop", "monitor", "smartphone", "charger", "tablet", "gaming console",
+  "speaker", "soundbar", "router", "modem", "printer", "streaming device","samsung", 
+  
+  // Personal Care
+  "hair dryer", "electric shaver", "electric toothbrush", "curling iron", "straightener", "electric razor",
+  
+  // Home Entertainment & Office
+  "home theater system", "dvd player", "blu-ray player", "projector", "electric pencil sharpener", "scanner",
+  
+  // Small Household Appliances
+  "electric fan", "humidifier", "dehumidifier", "air purifier", "clock", "alarm clock", "radio", "electric blanket",
+  
+  // Power Tools & Workshop
+  "drill", "saw", "sander", "electric lawnmower", "hedge trimmer", "leaf blower",
+  
+  // Transportation
+  "electric vehicle", "electric car", "electric bike", "electric scooter", "electric train", "electric tram", "charging station", "e-bike",
+  
+  // Industrial & Large Scale
+  "factory machine", "pump", "compressor", "data center", "server", "elevator", "escalator", "welding equipment",
+  
+  // Medical & Health
+  "ventilator", "x-ray machine", "mri scanner", "electric wheelchair", "cpap machine", "hearing aid",
+  
+  // Communication & Infrastructure
+  "cell tower", "internet server", "satellite", "traffic light", "electric gate", "security camera", "alarm system",
+  
+  // Miscellaneous/Others
+  "electric car charger", "pool pump", "filter", "hot tub", "aquarium", "garage door opener", "electric fence", "vending machine"
+];
+
+function loadProducts(db) {
+  return new Promise(resolve => {
+    onValue(ref(db, "catalogs"), snapshot => {
+      if(snapshot.exists()){
+        snapshot.forEach(categorySnap => {
+          categorySnap.forEach(itemSnap => {
+            const p = itemSnap.val();
+            if(!p) return;
+
+            const nameLower = (p.name || "").toLowerCase();
+            const categoryLower = (categorySnap.key || "").toLowerCase();
+            const descLower = (p.description || "").toLowerCase();
+
+            // Smart detection: name OR category OR description
+            const isElectric = electricKeywords.some(keyword =>
+              nameLower.includes(keyword) ||
+              categoryLower.includes(keyword) ||
+              descLower.includes(keyword)
+            );
+
+            if(isElectric){
+              allProducts.push({
+                name: p.name || "",
+                price: p.price || 0,
+                phone: p.phone || "",
+                image: p.image || "",
+                category: categorySnap.key || ""
+              });
+            }
+          });
+        });
+      }
+      resolve();
+    });
+  });
+}
+
+/* ======================
+   Render Products
+====================== */
+const searchResults = document.getElementById("searchResults");
+
+function renderProducts(products){
+  searchResults.innerHTML = "";
+  if(products.length === 0){
+    searchResults.innerHTML = "<p>No electric products found ⚡</p>";
+    return;
+  }
+
+  products.forEach(p=>{
+    searchResults.insertAdjacentHTML("beforeend", `
+      <div class="card">
+        <img src="${p.image}" alt="${p.name}">
+        <div class="card-body">
+          <h4>${p.name}</h4>
+          <div class="price">UGX ${Number(p.price).toLocaleString()}</div>
+          <div style="font-size:11px;color:#aaa;">Category: ${p.category}</div>
+          ${p.phone ? `
+          <div class="phone">📞 ${p.phone}</div>
+          <button onclick="location.href='tel:${p.phone}'">CALL</button>
+          <button onclick="
+            (function(){
+              const message = encodeURIComponent(
+                '🛒 Inquiry for: ${p.name}\\nPrice: UGX ${Number(p.price).toLocaleString()}'
+              );
+              window.open('https://wa.me/${p.phone.replace(/\D/g,'')}?text=' + message, '_blank');
+            })()
+          ">📦 WhatsApp</button>
+          ` : ""}
+        </div>
+      </div>
+    `);
+  });
+}
+
+/* ======================
+   Load All Products from All DBs
+====================== */
+Promise.all(dbApps.map(db => loadProducts(db))).then(()=> renderProducts(allProducts));
+
+/* ======================
+   Search Filter
+====================== */
+const searchInput = document.getElementById("searchInput");
+searchInput.addEventListener("input", e=>{
+  const query = e.target.value.toLowerCase();
+  const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query));
+  renderProducts(filtered);
+});
+</script>
+</body>
+</html>
